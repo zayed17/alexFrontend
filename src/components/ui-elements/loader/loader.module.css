@@ -1,0 +1,390 @@
+/* Premium White Dubai Luxury Real Estate Loader CSS */
+
+
+.loadingPage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    background-color: #ffffff;
+    overflow: hidden;
+    /* Removed previous animation as we'll use a new class for the fade effect */
+  }
+  
+  /* Cloud fade effect for the exit animation */
+  .fadeOutCloud {
+    animation: cloudFadeOut 0.8s ease-in-out forwards;
+  }
+  
+  /* Subtle Dubai skyline background */
+  .skylineBg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='800' viewBox='0 0 1440 800' fill='none'%3E%3Cpath d='M0,800h1440V750h-60v-80h-40v40h-60v-120h-40v80h-30v-160h-40v100h-30v-240h-100v180h-60v60h-80v-140h-40v80h-60v-40h-100v100h-40v-180h-80v80h-40v-40h-80v120h-40v-80h-80v40h-60v-100h-40v60h-80v80h-40v-160h-80v80h-40V800z' fill='rgba(0,0,0,0.02)'/%3E%3C/svg%3E");
+    background-position: bottom;
+    background-size: cover;
+    opacity: 0;
+    animation: skylineAppear 1.5s ease-out 0.5s forwards;
+  }
+  
+  /* Refined gold accent elements */
+  .goldAccent1, .goldAccent2 {
+    position: absolute;
+    background: linear-gradient(45deg, #c8a45c 0%, #e9d4a0 50%, #c8a45c 100%);
+    opacity: 0;
+  }
+  
+  .goldAccent1 {
+    top: 18%;
+    left: 15%;
+    width: 70%;
+    height: 1px;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: accentLineGrow 1.4s ease-out 0.7s forwards, goldShimmer 10s linear infinite;
+  }
+  
+  .goldAccent2 {
+    bottom: 18%;
+    right: 15%;
+    width: 70%;
+    height: 1px;
+    transform: scaleX(0);
+    transform-origin: right;
+    animation: accentLineGrow 1.4s ease-out 0.9s forwards, goldShimmer 10s linear 1s infinite;
+  }
+  
+  .contentContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px;
+    z-index: 2;
+  }
+  
+  /* Minimal luxury decorative frame */
+  .luxuryFrame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  
+  .frameCorner1, .frameCorner2, .frameCorner3, .frameCorner4 {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: #c8a45c;
+    opacity: 0;
+  }
+  
+  .frameCorner1 {
+    top: 0;
+    left: 0;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    animation: cornerAppear 0.5s ease-out 1.1s forwards, cornerPulse 4s ease-in-out infinite alternate;
+  }
+  
+  .frameCorner2 {
+    top: 0;
+    right: 0;
+    border-top: 1px solid;
+    border-right: 1px solid;
+    animation: cornerAppear 0.5s ease-out 1.2s forwards, cornerPulse 4s ease-in-out 0.5s infinite alternate;
+  }
+  
+  .frameCorner3 {
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid;
+    border-left: 1px solid;
+    animation: cornerAppear 0.5s ease-out 1.3s forwards, cornerPulse 4s ease-in-out 1s infinite alternate;
+  }
+  
+  .frameCorner4 {
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    animation: cornerAppear 0.5s ease-out 1.4s forwards, cornerPulse 4s ease-in-out 1.5s infinite alternate;
+  }
+  
+  /* Logo styling with subtle effects */
+  .logoWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+    overflow: hidden;
+  }
+  
+  .logoGlow {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 164, 92, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+    animation: glowPulse 4s ease-in-out infinite alternate;
+  }
+  
+  .logoShimmer {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background: linear-gradient(90deg, 
+      rgba(255,255,255,0) 0%, 
+      rgba(255,255,255,0.1) 20%, 
+      rgba(255,255,255,0.2) 40%,
+      rgba(255,255,255,0.1) 60%, 
+      rgba(255,255,255,0) 80%
+    );
+    transform: translateX(-200px) skewX(-30deg);
+    animation: shimmerEffect 6s ease-in-out infinite;
+  }
+  
+  .logoImage {
+    opacity: 0;
+    animation: logoAppear 1.2s ease-out 0.3s forwards, logoFloat 4s ease-in-out infinite alternate;
+  }
+  
+  /* Company name styling */
+  .companyNameContainer {
+    margin-bottom: 8px;
+  }
+  
+  .companyName {
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: textReveal 0.8s ease-out 0.6s forwards;
+  }
+  
+  .regularText {
+    color: #333333;
+  }
+  
+  .accentText {
+    color: #c8a45c;
+    margin-left: 3px;
+    font-weight: 400;
+  }
+  
+  /* Tagline styling with elegant underline */
+  .taglineWrapper {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  
+  .tagline {
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: #888888;
+    opacity: 0;
+    animation: textReveal 0.8s ease-out 0.8s forwards;
+  }
+  
+  .taglineUnderline {
+    position: absolute;
+    width: 40px;
+    height: 1px;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    background: linear-gradient(90deg, transparent, #c8a45c, transparent);
+    opacity: 0;
+    animation: underlineReveal 0.8s ease-out 1s forwards;
+  }
+  
+  /* Minimal loading indicator */
+  .loadingContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out 1s forwards;
+  }
+  
+  .loadingText {
+    font-size: 8px;
+    letter-spacing: 6px;
+    color: #aaaaaa;
+    margin-top: 20px;
+  }
+  
+  /* Elegant progress line */
+  .progressLineContainer {
+    position: relative;
+    width: 160px;
+    height: 1px;
+    background-color: #f0f0f0;
+    margin-bottom: 10px;
+    overflow: visible;
+  }
+  
+  .progressLine {
+    position: relative;
+    height: 100%;
+    background: linear-gradient(90deg, #c8a45c, #e9d4a0);
+    width: 0%;
+    transition: width 0.3s ease-out;
+  }
+  
+  .progressLineDot {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #c8a45c;
+    border-radius: 50%;
+    top: -2px;
+    right: -2px;
+    box-shadow: 0 0 10px rgba(200, 164, 92, 0.4);
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  /* Cloud fade animation */
+  @keyframes cloudFadeOut {
+    0% { 
+      opacity: 1; 
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+    100% { 
+      opacity: 0;
+      clip-path: polygon(
+        0% 15%,
+        10% 10%,
+        30% 20%,
+        50% 5%,
+        70% 15%,
+        90% 10%,
+        100% 5%,
+        100% 100%,
+        0% 100%
+      );
+      transform: translateY(-10px) scale(1.02);
+    }
+  }
+  
+  /* Refined animations */
+  @keyframes pageTransition {
+    0% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.02); }
+  }
+  
+  @keyframes skylineAppear {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes accentLineGrow {
+    0% { transform: scaleX(0); opacity: 0; }
+    100% { transform: scaleX(1); opacity: 0.6; }
+  }
+  
+  @keyframes goldShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  @keyframes cornerAppear {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 0.7; transform: scale(1); }
+  }
+  
+  @keyframes cornerPulse {
+    0% { opacity: 0.5; }
+    100% { opacity: 0.8; }
+  }
+  
+  @keyframes logoAppear {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes logoFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-6px); }
+  }
+  
+  @keyframes glowPulse {
+    0% { opacity: 0.2; transform: scale(0.95); }
+    100% { opacity: 0.5; transform: scale(1.05); }
+  }
+  
+  @keyframes shimmerEffect {
+    0% { transform: translateX(-200px) skewX(-30deg); }
+    30% { transform: translateX(160px) skewX(-30deg); }
+    100% { transform: translateX(160px) skewX(-30deg); }
+  }
+  
+  @keyframes textReveal {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes underlineReveal {
+    0% { transform: translateX(-50%) scaleX(0); opacity: 0; }
+    100% { transform: translateX(-50%) scaleX(1); opacity: 1; }
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  /* Media queries for responsiveness */
+  @media screen and (max-width: 768px) {
+    .contentContainer {
+      padding: 40px 20px;
+    }
+    
+    .goldAccent1, .goldAccent2 {
+      width: 80%;
+    }
+    
+    .progressLineContainer {
+      width: 140px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .logoImage {
+      width: 140px;
+      height: 140px;
+    }
+    
+    .logoGlow {
+      width: 140px;
+      height: 140px;
+    }
+    
+    .companyName {
+      font-size: 24px;
+      letter-spacing: 6px;
+    }
+    
+    .tagline {
+      font-size: 9px;
+      letter-spacing: 4px;
+    }
+    
+    .progressLineContainer {
+      width: 120px;
+    }
+  }

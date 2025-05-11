@@ -1,0 +1,214 @@
+"use client";
+import Image from "next/image";
+import logo from "@/assets/onbyz_logo.svg";
+import onbyz_logo_black from "@/assets/onbyz_logo_black.svg";
+import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import styles from "./navbar.module.css";
+import { usePathname } from "next/navigation";
+import BergerMenu from "@/components/SHAD_UI/BergerMenu";
+import HoverContent from "./HoverContent";
+
+// Import your images
+import servvImage from "@/assets/servv-product.jpg"; // Replace with actual path
+import consultingImage from "@/assets/consulting-service.jpg"; // Replace with actual path
+import aboutImage from "@/assets/about-company.jpg"; // Replace with actual path
+
+const Navbar = () => {
+  const pathname = usePathname();
+  const [bgColor, setBgColor] = useState("text-black");
+  const [isHovering, setIsHovering] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeItem, setActiveItem] = useState(null);
+
+  // Hover content data for each navigation item
+  const hoverContentData = {
+    Products: {
+      title: "servv",
+      description: "An innovative facility management app that streamlines maintenance, tracks service requests, and enhances team coordination for efficient operations.",
+      featuredImage: servvImage,
+      callToAction: {
+        text: "Know more",
+        href: "/products/servv"
+      }
+    },
+    Services: {
+      title: "Technology Consulting",
+      description: "We guide businesses through the digital landscape, providing strategic guidance to leverage the latest technologies. Our expert team delivers tailored solutions that effectively address key challenges and drive digital transformation.",
+      featuredImage: consultingImage,
+      links: [
+        { title: "Technology Consulting", href: "/services/technology-consulting" },
+        { title: "Application Development", href: "/services/application-development" },
+        { title: "Web Development & Management", href: "/services/web-development" },
+        { title: "Mobile App Development", href: "/services/mobile-development" },
+        { title: "Product Engineering", href: "/services/product-engineering" },
+        { title: "Digital Marketing", href: "/services/digital-marketing" },
+        { title: "Branding & Experience Design", href: "/services/branding-experience-design" },
+        { title: "Application Testing", href: "/services/application-testing" },
+      ],
+      callToAction: {
+        text: "Know more",
+        href: "/services/technology-consulting"
+      }
+    },
+    About: {
+      title: "Innovative Solutions, Unmatched Commitment.",
+      description: "Discover Onbyz and our commitment to delivering innovative and impactful solutions.",
+      featuredImage: aboutImage,
+      links: [
+        { title: "Company Overview", href: "/about-us/company" },
+        { title: "Meet Our Team", href: "/about-us/team" },
+      ],
+      callToAction: {
+        text: "Learn more",
+        href: "/about-us"
+      }
+    }
+  };
+
+  // Extract ID from the path for dynamic routes
+  const extractIdFromPath = (pathname) => {
+    const parts = pathname.split("/");
+    return parts[2] || null;
+  };
+  
+  const extractedId = extractIdFromPath(pathname);
+
+  // Define valid paths as an array
+  const validPaths = [
+    "/",
+    "/industries",
+    "/products",
+    "/services",
+    "/services/technology-consulting",
+    "/services/application-development",
+    "/services/web-development",
+    "/services/mobile-development",
+    "/services/product-engineering",
+    "/services/digital-marketing",
+    "/services/branding-experience-design",
+    "/services/application-testing",
+    "/testimonials",
+    "/our-works",
+    "/our-works/bread-factory",
+    "/products/servv",
+    `/our-works/${extractedId}`,
+  ];
+
+  // Define navigation items as an array
+  const navItems = [
+    { title: "Products", href: "/products" },
+    { title: "Services", href: "/services" },
+    { title: "Industries", href: "/industries" },
+    { title: "About", href: "/about-us" },
+    { title: "Contact", href: "/contact-us" },
+  ];
+
+  // Update the text color based on scroll position and hover state
+  const updateTextColor = () => {
+    if (isHovering) return;
+    
+    if (isScrolled) {
+      setBgColor("text-black");
+    } else {
+      setBgColor(validPaths.includes(pathname) ? "text-white" : "text-black");
+    }
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = window.scrollY;
+      setIsScrolled(scrollHeight > 10);
+      
+      if (!isHovering) {
+        updateTextColor();
+      }
+    };
+
+    // Initialize state
+    updateTextColor();
+    
+    // Add event listener
+    window.addEventListener("scroll", handleScroll);
+    
+    // Cleanup
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname, isHovering, isScrolled]);
+
+  // Handle hover effects
+  const handleMouseEnter = (itemTitle) => {
+    setIsHovering(true);
+    setBgColor("text-black");
+    setActiveItem(itemTitle);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    setActiveItem(null);
+    updateTextColor();
+  };
+
+  return (
+    <>
+      <div
+        className={`mobL:px-[3%] px-[5%] top-0 sticky z-50 ${
+          bgColor === "text-black" || isScrolled ? "bg-white" : ""
+        }`}
+      >
+        <nav className="flex justify-between">
+          <div className="my-auto w-fit">
+            <Link
+              href="/#home"
+              className={`${bgColor === "text-black" ? styles.svgBlack : ""}`}
+            >
+              {bgColor === "text-black" ? (
+                <Image src={onbyz_logo_black} alt="onbyz logo" className="min-w-[119px]" />
+              ) : (
+                <Image src={logo} alt="onbyz logo" className="min-w-[119px]" />
+              )}
+            </Link>
+          </div>
+          <div>
+            <ul className={`${bgColor} border-blue-900 flex gap-[72px]`}>
+              {navItems.map((item, index) => (
+                <li
+                  key={index}
+                  className={`pb-[35px] mt-[35px] cursor-pointer ${styles.customBreakingPoint}`}
+                  onMouseEnter={() => handleMouseEnter(item.title)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Link href={item.href}>{item.title}</Link>
+                </li>
+              ))}
+              <li
+                className={`my-auto ${
+                  bgColor === "text-black" ? styles.svgBlack : ""
+                }`}
+              >
+                <BergerMenu />
+              </li>
+            </ul>
+          </div>
+        </nav>
+        {pathname !== "/" && (
+          <hr
+            className={`${
+              bgColor === "text-black" ? "border-1 border-gray-600" : ""
+            } hidden mobL:block`}
+          />
+        )}
+      </div>
+
+      {/* HoverContent component */}
+      <HoverContent
+        isVisible={isHovering}
+        activeItem={activeItem}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={handleMouseLeave}
+        contentData={hoverContentData}
+      />
+    </>
+  );
+};
+
+export default Navbar;
