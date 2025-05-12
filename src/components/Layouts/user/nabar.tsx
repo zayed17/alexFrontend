@@ -143,6 +143,7 @@ const isWhiteBackgroundPage = (path: string) => {
     '/careers',
     '/luxuryproperty',
     '/media-center',
+    '/media-center',
   ];
   
   // Check for exact matches with static pages
@@ -344,7 +345,7 @@ const showWhiteBackground = scrolled || isWhiteBackgroundPage(pathname || "");
                   <Link
                     href={link.href}
                     className={`text-sm md:text-[10px] lg:text-sm font-medium uppercase tracking-wider ${
-                      showWhiteBackground ? "text-black" : "text-white"
+                      showWhiteBackground ? "text-black" : "text-black"
                     } transition-colors duration-200 hover:text-yellow-300`}
                   >
                     {link.label}
@@ -364,7 +365,7 @@ const showWhiteBackground = scrolled || isWhiteBackgroundPage(pathname || "");
                 key={link.href}
                 href={link.href}
                 className={`text-sm md:text-[10px] lg:text-sm font-medium uppercase tracking-wider ${
-                  showWhiteBackground ? "text-black" : "text-white"
+                  showWhiteBackground ? "text-black" : "text-black"
                 } transition-colors duration-200 hover:text-yellow-300`}
               >
                 {link.label}
