@@ -4,5 +4,6 @@ import communityBanner from "@public/images/communityImage/banner.png";
 import dummy from "@public/images/communityImage/dummy.png";
 import whiteBanner from "@public/images/homepage/whitebg.png";
 import agentImage from "@public/images/homepage/agent.png";
+import aboutAgent from "@public/images/homepage/image.png";
 
-export { mainLogo, communityBanner, dummy, mainLogoBlack ,whiteBanner,agentImage};
+export { mainLogo, communityBanner, dummy, mainLogoBlack ,whiteBanner,agentImage,aboutAgent};
