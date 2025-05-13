@@ -130,7 +130,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="font-barlow">
-        <PageLoader>
+        {/* <PageLoader> */}
           <ToasterProvider />
 
           <Navbar />
@@ -143,7 +143,7 @@ export default async function RootLayout({
           <div className="relative z-40">
             <WhatsAppWidget />
           </div>
-        </PageLoader>
+        {/* </PageLoader> */}
       </body>
     </html>
   );
