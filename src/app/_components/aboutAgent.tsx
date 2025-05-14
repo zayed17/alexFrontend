@@ -21,7 +21,7 @@ export default function AboutAget() {
             </div>
             
             {/* Stats box */}
-            <div className="absolute -bottom-10 -right-10 md:right-0 lg:-right-16 bg-white rounded-[40px] shadow-lg p-6 max-w-lg">
+            <div className="absolute -bottom-10 -right-10 md:right-0 lg:-right-16 bg-white rounded-[40px] shadow-lg px-12 py-6 max-w-xl">
               <ul className=" list-none">
                 <li className="flex items-start">
                   <span className="text-[#071C35] mr-2 font-bold">•</span>
@@ -55,7 +55,7 @@ export default function AboutAget() {
               ensuring your money works for maximum profitability.
             </p>
             
-            <button className="bg-[#071C35] text-white px-8 py-3 rounded-full font-medium hover:bg-[#0a3060] transition-colors">
+            <button className="bg-[#071C35] text-white text-sm px-8 py-3 rounded-full font-medium hover:bg-[#0a3060] transition-colors">
               SUBMIT A REQUEST
             </button>
           </div>

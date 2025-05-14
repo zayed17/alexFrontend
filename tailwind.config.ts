@@ -9,6 +9,7 @@ const config: Config = {
       fontFamily: {
         barlow: ['Barlow',],
         presto: ['Presto',],
+        archivo: ['Archivo',],
       },
       screens: {
         "2xsm": "375px",

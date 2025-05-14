@@ -129,7 +129,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="font-barlow">
+      <body className="font-archivo">
         {/* <PageLoader> */}
           <ToasterProvider />
 

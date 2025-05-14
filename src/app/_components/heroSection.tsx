@@ -24,7 +24,7 @@ export default function RealEstateLanding() {
               <h3 className="mb-1 font-presto text-xl font-semibold italic text-[#877455]">
                 Alexey Andrienko
               </h3>
-              <p className="mb-6 mt-2 text-base">Real Estate Expert in Dubai</p>
+              <p className="mb-6 mt-2 text-base ">Real Estate Expert in Dubai</p>
 
               <h1 className="mb-4 font-presto text-2xl sm:text-3xl font-normal !leading-none !tracking-[-0.04rem] text-[#071C35]">
                 Invest in Dubai Islands Luxury Real Estate
