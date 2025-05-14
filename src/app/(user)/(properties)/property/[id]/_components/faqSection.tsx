@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import {  ChevronDown, ChevronUp } from "lucide-react";
 
 // FAQ Item Type
 type FAQItemType = {
@@ -80,9 +80,9 @@ export default function EnhancedFAQ({ faqs = defaultFAQs }) {
                   }`}
                 >
                   {openIndex === index ? (
-                    <Minus size={16} />
+                    <ChevronUp size={16} />
                   ) : (
-                    <Plus size={16} />
+                    <ChevronDown size={16} />
                   )}
                 </div>
               </button>
@@ -96,7 +96,7 @@ export default function EnhancedFAQ({ faqs = defaultFAQs }) {
                     transition={{ duration: 0.3 }}
                     className="overflow-hidden"
                   >
-                    <div className="border-t border-gray-100 p-5 pt-0 text-gray-600">
+                    <div className="  !px-6 pb-2  text-gray-600">
                       {faq.answer}
                     </div>
                   </motion.div>

@@ -44,9 +44,8 @@ const PropertyInfoRequest = ({
   };
 
   return (
-    <div className="w-full bg-gray-50 py-12 md:py-16">
-      <div className="container mx-auto max-w-6xl px-4 md:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-between gap-8 md:flex-row lg:gap-12">
+  
+        <div className="flex flex-col items-center justify-between gap-8 md:flex-row lg:gap-12 px-4 md:px-6 lg:px-8">
           {/* Form Section */}
           <div className="w-full space-y-4 md:w-1/2">
             <div className="text-sm font-medium uppercase tracking-wider text-gray-500">
@@ -131,8 +130,7 @@ const PropertyInfoRequest = ({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+  
   );
 };
 
