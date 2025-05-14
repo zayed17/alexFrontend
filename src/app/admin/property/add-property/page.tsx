@@ -8,14 +8,11 @@ export const metadata: Metadata = {
 
 export default async function AddPropertyPage() {
 
-  const amenitiesData = await getAmenities()
-  const propertyTypes = await getPropertyTypes()
-  const communityData = await getCommunityNames()
-  const agentData = await getAgents()
+  const amenitiesData = [{iconName:"fsdfds",_id:"fasdfas"}]
 
   return (
     <>
-      <PropertyForm amenitiesData={amenitiesData} propertyTypes={propertyTypes} communityData={communityData} agentData={agentData} />
+      <PropertyForm amenitiesData={amenitiesData} />
     </>
   );
 }

@@ -25,9 +25,6 @@ export default async function EditCommunityPage({ params }: any) {
       <PropertyForm
         property={property}
         amenitiesData={amenitiesData}
-        propertyTypes={propertyTypes}
-        communityData={communityData}
-        agentData={agentData}
       />
     </>
   );
