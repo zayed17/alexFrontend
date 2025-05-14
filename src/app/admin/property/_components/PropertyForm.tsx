@@ -1,125 +1,121 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import InputGroup from "@/components/FormElements/InputGroup";
-import TextArea from "@/components/FormElements/InputGroup/text-area";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { XCircle, Loader2, Plus } from "lucide-react";
-import { axiosInstance } from "@/lib/axios";
-import { toast } from "react-hot-toast";
-import { ShowcaseSection } from "@/components/Layouts/showcase-section";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import FAQInput from "./FAQInput";
-import DynamicPointInput from "../../career/_components/DynamicPointInput";
-import LocationSelector from "../../community/_components/locationSelect";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import * as LucideIcons from "lucide-react";
+"use client"
+import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import InputGroup from "@/components/FormElements/InputGroup"
+import TextArea from "@/components/FormElements/InputGroup/text-area"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { XCircle, Loader2, Plus } from "lucide-react"
+import { axiosInstance } from "@/lib/axios"
+import { toast } from "react-hot-toast"
+import { ShowcaseSection } from "@/components/Layouts/showcase-section"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import FAQInput from "./FAQInput"
+import LocationSelector from "../../community/_components/locationSelect"
+import * as LucideIcons from "lucide-react"
+import FeatureInput from "./features"
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
   price: z.string().min(1, "Price is required"),
   paymentPlan: z.string().min(1, "Payment plan is required"),
-  completion: z.string().min(1, "Completion date is required"),
-  installments: z.string().min(1, "Installments information is required"),
-  paymentStructure: z
-    .string()
-    .min(1, "payment Structure information is required"),
+  handover: z.string().min(1, "Handover date is required"),
+  paymentStructure: z.string().min(1, "Payment Structure information is required"),
   downPayment: z.string().min(1, "Down payment information is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
-  handover: z.string().min(1, "Handover date is required"),
-  areaSize: z.string().min(1, "Area size is required"),
+  area: z.string().min(1, "Area size is required"),
   developer: z.string().min(1, "Developer information is required"),
   unit: z.string().min(1, "Unit information is required"),
-  propertyType: z.string().min(1, "Property type is required"),
-  agentId: z.string().min(1, "Please select an agent"),
   description: z.string().min(1, "Description is required"),
+  features: z.array(z.string()).min(1, "At least one feature is required"),
   amenities: z.array(z.string()).min(1, "At least one amenity is required"),
+  paymentDescription: z.string().min(1, "Payment description is required"),
+  bookingPercentage: z.string().min(1, "Booking percentage is required"),
+  constructionPercentage: z.string().min(1, "Construction percentage is required"),
+  handOverPercentage: z.string().min(1, "Handover percentage is required"),
   locationDescription: z.string().min(1, "Location description is required"),
   location: z.object({
     country: z.string().min(1, "Please select a location"),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
   }),
-  youtubeVideo: z.string().min(1, "Youtube video url is required"),
-  about: z.string().min(1, "About is required"),
-});
+  isAffordable: z.boolean().optional(),
+  isLuxury: z.boolean().optional(),
+  isExclusive: z.boolean().optional(),
+  development: z.object({
+    title1: z.string().min(1, "Development title 1 is required"),
+    title2: z.string().min(1, "Development title 2 is required"),
+    title3: z.string().min(1, "Development title 3 is required"),
+  }),
+})
 
-type PropertyFormData = z.infer<typeof propertySchema>;
+type PropertyFormData = z.infer<typeof propertySchema>
 
 interface LocationHighlight {
-  _id?: string;
-  title: string;
-  time: string;
-  image: string;
+  _id?: string
+  title: string
+  time: string
+  image: string
 }
 
 interface PropertyFormProps {
-  property?: any;
-  propertyTypes?: any[];
-  amenitiesData?: any[];
-  communityData?: any[];
-  agentData?: any[];
+  property?: any
+  amenitiesData?: any[]
 }
 
-const PropertyForm = ({
-  property = null,
-  propertyTypes = [],
-  amenitiesData = [],
-  communityData = [],
-  agentData = [],
-}: PropertyFormProps) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageError, setImageError] = useState<string | null>(null);
+const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps) => {
+  const [isMounted, setIsMounted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [imageError, setImageError] = useState<string | null>(null)
 
   // Image states
-  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
-  const [selectedMainImage, setSelectedMainImage] = useState<File | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null)
+  const [selectedMainImage, setSelectedMainImage] = useState<File | null>(null)
 
-  const [secondaryImagePreview, setSecondaryImagePreview] = useState<
-    string | null
-  >(null);
-  const [selectedSecondaryImage, setSelectedSecondaryImage] =
-    useState<File | null>(null);
+  const [secondaryImagePreview, setSecondaryImagePreview] = useState<string | null>(null)
+  const [selectedSecondaryImage, setSelectedSecondaryImage] = useState<File | null>(null)
 
-  const [sliderImages, setSliderImages] = useState<string[]>([]);
-  const [selectedSliderImages, setSelectedSliderImages] = useState<File[]>([]);
-  const [existingSliderImages, setExistingSliderImages] = useState<string[]>(
-    [],
-  );
-  const [removedSliderImages, setRemovedSliderImages] = useState<string[]>([]);
+  const [sliderImages, setSliderImages] = useState<string[]>([])
+  const [selectedSliderImages, setSelectedSliderImages] = useState<File[]>([])
+  const [existingSliderImages, setExistingSliderImages] = useState<string[]>([])
+  const [removedSliderImages, setRemovedSliderImages] = useState<string[]>([])
 
-  // Downloads states
-  const [selectedBrochure, setSelectedBrochure] = useState<File | null>(null);
-  const [selectedFloorPlan, setSelectedFloorPlan] = useState<File | null>(null);
-  const [selectedMasterPlan, setSelectedMasterPlan] = useState<File | null>(
-    null,
-  );
+  // Document states
+  const [brochureFile, setBrochureFile] = useState<File | null>(null)
+  const [brochureImageFile, setBrochureImageFile] = useState<File | null>(null)
+  const [brochureImagePreview, setBrochureImagePreview] = useState<string | null>(null)
+
+  const [priceListFile, setPriceListFile] = useState<File | null>(null)
+  const [priceListImageFile, setPriceListImageFile] = useState<File | null>(null)
+  const [priceListImagePreview, setPriceListImagePreview] = useState<string | null>(null)
+
+  const [paymentFile, setPaymentFile] = useState<File | null>(null)
+  const [paymentImageFile, setPaymentImageFile] = useState<File | null>(null)
+  const [paymentImagePreview, setPaymentImagePreview] = useState<string | null>(null)
+// console.log(priceListFile,  brochureImageFile, paymentImageFile, "checking this",paymentFile, "checking this")
+  // Development images
+  const [developmentImage1File, setDevelopmentImage1File] = useState<File | null>(null)
+  const [developmentImage1Preview, setDevelopmentImage1Preview] = useState<string | null>(null)
+  const [developmentImage2File, setDevelopmentImage2File] = useState<File | null>(null)
+  const [developmentImage2Preview, setDevelopmentImage2Preview] = useState<string | null>(null)
 
   // Complex data states
-  const [locationHighlights, setLocationHighlights] = useState<any>([]);
-  const [floorPlans, setFloorPlans] = useState<any[]>([]);
-  const [faqs, setFaqs] = useState<
-    { _id?: string; question: string; answer: string }[]
-  >([]);
-  const [removedFaqIds, setRemovedFaqIds] = useState<string[]>([]);
+  const [locationHighlights, setLocationHighlights] = useState<any>([])
+  const [faqs, setFaqs] = useState<{ _id?: string; question: string; answer: string }[]>([])
+  const [removedFaqIds, setRemovedFaqIds] = useState<string[]>([])
 
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
-  const [selectedCommunity, setSelectedCommunity] = useState<string>("");
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [features, setFeatures] = useState<string[]>([])
 
-  const router = useRouter();
-  const isEditMode = !!property;
+  const router = useRouter()
+  const isEditMode = !!property
+
+
 
   const {
     register,
@@ -135,47 +131,48 @@ const PropertyForm = ({
       title: property?.title || "",
       price: property?.price || "",
       paymentPlan: property?.paymentPlan || "",
-      completion: property?.completion || "",
-      installments: property?.installments || "",
-      downPayment: property?.downPayment || "",
-      paymentStructure: property?.paymentStructure || "",
-      bedrooms: property?.bedrooms || "",
       handover: property?.handover || "",
-      areaSize: property?.areaSize || "",
+      paymentStructure: property?.paymentStructure || "",
+      downPayment: property?.downPayment || "",
+      bedrooms: property?.bedrooms || "",
+      area: property?.area || "",
       developer: property?.developer || "",
       unit: property?.unit || "",
-      propertyType: property?.propertyType?._id || "",
-      agentId:
-        typeof property?.agentId === "object"
-          ? property?.agentId?._id
-          : property?.agentId || "",
       description: property?.description || "",
+      features: property?.features?.map((feature: any) => (typeof feature === "object" ? feature._id : feature)) || [],
       amenities:
-        property?.amenities?.map((amenity: any) =>
-          typeof amenity === "object" ? amenity._id : amenity,
-        ) || [],
+        property?.amenities?.map((amenity: any) => (typeof amenity === "object" ? amenity._id : amenity)) || [],
+      paymentDescription: property?.paymentDescription || "",
+      bookingPercentage: property?.bookingPercentage || "",
+      constructionPercentage: property?.constructionPercentage || "",
+      handOverPercentage: property?.handOverPercentage || "",
       locationDescription: property?.locationDescription || "",
       location: {
         country: property?.location?.country || "",
         latitude: property?.location?.latitude,
         longitude: property?.location?.longitude,
       },
-      youtubeVideo: property?.youtubeVideo || "",
-      about: property?.about || "",
+      isAffordable: property?.isAffordable || false,
+      isLuxury: property?.isLuxury || false,
+      isExclusive: property?.isExclusive || false,
+      development: {
+        title1: property?.development?.title1 || "",
+        title2: property?.development?.title2 || "",
+        title3: property?.development?.title3 || "",
+      },
     },
-  });
+  })
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsMounted(true)
 
     if (isEditMode) {
-      // Set image previews
       if (property?.mainImage) {
-        setMainImagePreview(`${property.mainImage}`);
+        setMainImagePreview(`${property.mainImage}`)
       }
 
       if (property?.secondaryImage) {
-        setSecondaryImagePreview(`${property.secondaryImage}`);
+        setSecondaryImagePreview(`${property.secondaryImage}`)
       }
 
       // Set slider images
@@ -183,549 +180,507 @@ const PropertyForm = ({
         const sliderImgPreviews = property.sliderImages.map((image: any) => {
           // Handle if image is an array or string
           if (Array.isArray(image)) {
-            return image[0];
+            return image[0]
           }
-          return `${image}`;
-        });
-        setSliderImages(sliderImgPreviews);
-        setExistingSliderImages(property.sliderImages);
+          return `${image}`
+        })
+        setSliderImages(sliderImgPreviews)
+        setExistingSliderImages(property.sliderImages)
       }
+
+      // Set document previews
+      if (property?.brochure?.image) {
+        setBrochureImagePreview(`${property.brochure.image}`)
+      }
+
+      if (property?.priceList?.image) {
+        setPriceListImagePreview(`${property.priceList.image}`)
+      }
+
+      if (property?.payment?.image) {
+        setPaymentImagePreview(`${property.payment.image}`)
+      }
+
+      // Set development images
+      if (property?.development?.image1) {
+        setDevelopmentImage1Preview(`${property.development.image1}`)
+      }
+
+      if (property?.development?.image2) {
+        setDevelopmentImage2Preview(`${property.development.image2}`)
+      }
+
       // Set amenities
       if (property?.amenities && Array.isArray(property.amenities)) {
         const amenityIds = property.amenities.map((amenity: any) => {
           if (amenity && typeof amenity === "object" && amenity._id) {
-            return String(amenity._id);
+            return String(amenity._id)
           }
-          return String(amenity);
-        });
+          return String(amenity)
+        })
 
-        setSelectedAmenities(amenityIds);
-        setValue("amenities", amenityIds);
+        setSelectedAmenities(amenityIds)
+        setValue("amenities", amenityIds)
+      }
+
+      // Set features
+      if (property?.features && Array.isArray(property.features)) {
+        const featureValues = property.features.map((feature: any) => {
+          if (feature && typeof feature === "object" && feature.title) {
+            return feature.title
+          }
+          return String(feature)
+        })
+        setFeatures(featureValues)
       }
 
       // Set property type
-      if (property?.propertyType) {
-        const propertyTypeId =
-          typeof property.propertyType === "object"
-            ? property.propertyType._id
-            : property.propertyType;
-
-        setSelectedPropertyType(propertyTypeId);
-        setValue("propertyType", propertyTypeId);
-      }
-      if (property?.communityId) {
-        const communityId =
-          typeof property.communityId === "object"
-            ? property.communityId._id
-            : property.communityId;
-        setSelectedCommunity(communityId);
-      }
 
       // Set location highlights
-      if (
-        property?.locationHighlights &&
-        Array.isArray(property.locationHighlights)
-      ) {
-        setLocationHighlights(property.locationHighlights);
-      }
-
-      // Set floor plans
-      if (property?.floorPlans && Array.isArray(property.floorPlans)) {
-        setFloorPlans(property.floorPlans);
+      if (property?.locationHighlights && Array.isArray(property.locationHighlights)) {
+        setLocationHighlights(property.locationHighlights)
       }
 
       // Set FAQs
       if (property?.faqs && Array.isArray(property.faqs)) {
-        setFaqs(property.faqs);
+        setFaqs(property.faqs)
+      }
+
+      // Set boolean values
+      if (property?.isAffordable !== undefined) {
+        setValue("isAffordable", property.isAffordable)
+      }
+
+      if (property?.isLuxury !== undefined) {
+        setValue("isLuxury", property.isLuxury)
+      }
+
+      if (property?.isExclusive !== undefined) {
+        setValue("isExclusive", property.isExclusive)
       }
     }
-  }, [isEditMode, property, setValue]);
+  }, [isEditMode, property, setValue])
 
   const handleAmenityChange = (amenityId: string) => {
     setSelectedAmenities((prev) => {
-      const newSelection = prev.includes(amenityId)
-        ? prev.filter((id) => id !== amenityId)
-        : [...prev, amenityId];
+      const newSelection = prev.includes(amenityId) ? prev.filter((id) => id !== amenityId) : [...prev, amenityId]
 
-      setValue("amenities", newSelection);
-      return newSelection;
-    });
-  };
-
-  const handlePropertyTypeChange = (propertyTypeId: string) => {
-    setSelectedPropertyType(propertyTypeId);
-    setValue("propertyType", propertyTypeId);
-  };
-  const handleCommunityChange = (communityId: string) => {
-    setSelectedCommunity(communityId);
-  };
+      setValue("amenities", newSelection)
+      return newSelection
+    })
+  }
 
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    type: "main" | "secondary" | "profile" | "slider",
+    type:
+      | "main"
+      | "secondary"
+      | "slider"
+      | "brochureImage"
+      | "priceListImage"
+      | "paymentImage"
+      | "developmentImage1"
+      | "developmentImage2",
   ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
     // Common image validation
     const validateImage = (file: File): boolean => {
       if (file.size > 15 * 1024 * 1024) {
-        setImageError("Image size should be less than 15MB");
-        return false;
+        setImageError("Image size should be less than 15MB")
+        return false
       }
 
-      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
       if (!validTypes.includes(file.type)) {
-        setImageError("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
-        return false;
+        setImageError("Please upload a valid image (JPEG, PNG, GIF, WEBP)")
+        return false
       }
 
-      setImageError(null);
-      return true;
-    };
+      setImageError(null)
+      return true
+    }
 
-    const file = files[0];
-    if (!validateImage(file)) return;
+    const file = files[0]
+    if (!validateImage(file)) return
 
     switch (type) {
       case "main":
-        setMainImagePreview(URL.createObjectURL(file));
-        setSelectedMainImage(file);
-        break;
+        setMainImagePreview(URL.createObjectURL(file))
+        setSelectedMainImage(file)
+        break
       case "secondary":
-        setSecondaryImagePreview(URL.createObjectURL(file));
-        setSelectedSecondaryImage(file);
-        break;
+        setSecondaryImagePreview(URL.createObjectURL(file))
+        setSelectedSecondaryImage(file)
+        break
       case "slider":
-        const newFiles: File[] = [];
-        const newPreviews: string[] = [];
+        const newFiles: File[] = []
+        const newPreviews: string[] = []
 
         Array.from(files).forEach((file) => {
           if (validateImage(file)) {
-            newFiles.push(file);
-            newPreviews.push(URL.createObjectURL(file));
+            newFiles.push(file)
+            newPreviews.push(URL.createObjectURL(file))
           }
-        });
+        })
 
-        setSelectedSliderImages((prev) => [...prev, ...newFiles]);
-        setSliderImages((prev) => [...prev, ...newPreviews]);
-        break;
+        setSelectedSliderImages((prev) => [...prev, ...newFiles])
+        setSliderImages((prev) => [...prev, ...newPreviews])
+        break
+      case "brochureImage":
+        setBrochureImagePreview(URL.createObjectURL(file))
+        setBrochureImageFile(file)
+        break
+      case "priceListImage":
+        setPriceListImagePreview(URL.createObjectURL(file))
+        setPriceListImageFile(file)
+        break
+      case "paymentImage":
+        setPaymentImagePreview(URL.createObjectURL(file))
+        setPaymentImageFile(file)
+        break
+      case "developmentImage1":
+        setDevelopmentImage1Preview(URL.createObjectURL(file))
+        setDevelopmentImage1File(file)
+        break
+      case "developmentImage2":
+        setDevelopmentImage2Preview(URL.createObjectURL(file))
+        setDevelopmentImage2File(file)
+        break
     }
-  };
+  }
 
-  const handleFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: "brochure" | "floorPlan" | "masterPlan",
-  ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "brochure" | "priceList" | "payment") => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
-    const file = files[0];
+    const file = files[0]
     if (file.size > 15 * 1024 * 1024) {
-      toast.error("File size should be less than 15MB");
-      return;
+      toast.error("File size should be less than 15MB")
+      return
     }
 
     switch (type) {
       case "brochure":
-        setSelectedBrochure(file);
-        break;
-      case "floorPlan":
-        setSelectedFloorPlan(file);
-        break;
-      case "masterPlan":
-        setSelectedMasterPlan(file);
-        break;
+        setBrochureFile(file)
+        break
+      case "priceList":
+        setPriceListFile(file)
+        break
+      case "payment":
+        setPaymentFile(file)
+        break
     }
-  };
+  }
 
   const removeImage = (
-    type: "main" | "secondary" | "profile" | "slider",
+    type:
+      | "main"
+      | "secondary"
+      | "slider"
+      | "brochureImage"
+      | "priceListImage"
+      | "paymentImage"
+      | "developmentImage1"
+      | "developmentImage2",
     index?: number,
   ) => {
     switch (type) {
       case "main":
-        setMainImagePreview(null);
-        setSelectedMainImage(null);
-        break;
+        setMainImagePreview(null)
+        setSelectedMainImage(null)
+        break
       case "secondary":
-        setSecondaryImagePreview(null);
-        setSelectedSecondaryImage(null);
-        break;
+        setSecondaryImagePreview(null)
+        setSelectedSecondaryImage(null)
+        break
       case "slider":
         if (typeof index === "number") {
           if (index < existingSliderImages.length) {
-            const imageToRemove = existingSliderImages[index];
-            setRemovedSliderImages((prev) => [...prev, imageToRemove]);
+            const imageToRemove = existingSliderImages[index]
+            setRemovedSliderImages((prev) => [...prev, imageToRemove])
             setExistingSliderImages((prev) => {
-              const updated = [...prev];
-              updated.splice(index, 1);
-              return updated;
-            });
+              const updated = [...prev]
+              updated.splice(index, 1)
+              return updated
+            })
           }
 
           setSliderImages((prev) => {
-            const updated = [...prev];
-            updated.splice(index, 1);
-            return updated;
-          });
+            const updated = [...prev]
+            updated.splice(index, 1)
+            return updated
+          })
 
           if (index >= existingSliderImages.length) {
             setSelectedSliderImages((prev) => {
-              const updated = [...prev];
-              updated.splice(index - existingSliderImages.length, 1);
-              return updated;
-            });
+              const updated = [...prev]
+              updated.splice(index - existingSliderImages.length, 1)
+              return updated
+            })
           }
         }
-        break;
+        break
+      case "brochureImage":
+        setBrochureImagePreview(null)
+        setBrochureImageFile(null)
+        break
+      case "priceListImage":
+        setPriceListImagePreview(null)
+        setPriceListImageFile(null)
+        break
+      case "paymentImage":
+        setPaymentImagePreview(null)
+        setPaymentImageFile(null)
+        break
+      case "developmentImage1":
+        setDevelopmentImage1Preview(null)
+        setDevelopmentImage1File(null)
+        break
+      case "developmentImage2":
+        setDevelopmentImage2Preview(null)
+        setDevelopmentImage2File(null)
+        break
     }
-  };
+  }
 
   const handleAddLocationHighlight = () => {
-    setLocationHighlights([
-      ...locationHighlights,
-      { title: "", time: "", image: "" },
-    ]);
-  };
+    setLocationHighlights([...locationHighlights, { title: "", time: "", image: "" }])
+  }
 
   const handleRemoveLocationHighlight = (index: number) => {
-    setLocationHighlights(
-      locationHighlights.filter((_: any, i: any) => i !== index),
-    );
-  };
+    setLocationHighlights(locationHighlights.filter((_: any, i: any) => i !== index))
+  }
 
-  const handleUpdateLocationHighlight = (
-    index: number,
-    field: keyof LocationHighlight,
-    value: string,
-  ) => {
-    const updatedHighlights = [...locationHighlights];
-    updatedHighlights[index] = { ...updatedHighlights[index], [field]: value };
-    setLocationHighlights(updatedHighlights);
-  };
+  const handleUpdateLocationHighlight = (index: number, field: keyof LocationHighlight, value: string) => {
+    const updatedHighlights = [...locationHighlights]
+    updatedHighlights[index] = { ...updatedHighlights[index], [field]: value }
+    setLocationHighlights(updatedHighlights)
+  }
 
-  const handleAgentChange = (value: string) => {
-    setValue("agentId", value);
-  };
 
-  const handleLocationImageChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const handleLocationImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
 
-    const file = files[0];
+    const file = files[0]
     if (file.size > 15 * 1024 * 1024) {
-      toast.error("Image size should be less than 15MB");
-      return;
+      toast.error("Image size should be less than 15MB")
+      return
     }
 
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
     if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
-      return;
+      toast.error("Please upload a valid image (JPEG, PNG, GIF, WEBP)")
+      return
     }
 
     // Create file preview URL and update the location highlights
-    const imageUrl = URL.createObjectURL(file);
-    const updatedHighlights = [...locationHighlights];
+    const imageUrl = URL.createObjectURL(file)
+    const updatedHighlights = [...locationHighlights]
     updatedHighlights[index] = {
       ...updatedHighlights[index],
       image: imageUrl,
       imageFile: file, // Store the file object for form submission
-    };
-    setLocationHighlights(updatedHighlights);
-  };
-
-  const handleAddFloorPlan = () => {
-    setFloorPlans([
-      ...floorPlans,
-      { title: "", totalSquareFeet: "", image: "", brochureLink: "" },
-    ]);
-  };
-
-  const handleRemoveFloorPlan = (index: number) => {
-    setFloorPlans(floorPlans.filter((_, i) => i !== index));
-  };
-
-  const handleUpdateFloorPlan = (index: number, field: any, value: string) => {
-    const updatedPlans = [...floorPlans];
-    updatedPlans[index] = { ...updatedPlans[index], [field]: value };
-    setFloorPlans(updatedPlans);
-  };
-
-  const handleFloorPlanImageChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    if (file.size > 15 * 1024 * 1024) {
-      toast.error("Image size should be less than 15MB");
-      return;
     }
+    setLocationHighlights(updatedHighlights)
+  }
 
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
-      return;
-    }
+  const handleCheckboxChange = (field: "isAffordable" | "isLuxury" | "isExclusive") => {
+    setValue(field, !watch(field))
+  }
 
-    // Create file preview URL and update the floor plans
-    const imageUrl = URL.createObjectURL(file);
-    const updatedPlans = [...floorPlans];
-    updatedPlans[index] = {
-      ...updatedPlans[index],
-      image: imageUrl,
-      imageFile: file, // Store the file object for form submission
-    };
-    setFloorPlans(updatedPlans);
-  };
+  // console.log("Form data:", data);
+console.log("Validation errors:", errors);
+console.log("Selected amenities:", selectedAmenities);
+console.log("Features:", features);
 
-  const handleFloorPlanBrochureChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  const onSubmit = async (data: any) => {
+    console.log(data, "checking this ")
+    console.log("Validation errors:", errors); // Log all validation errors
 
-    const file = files[0];
-    if (file.size > 15 * 1024 * 1024) {
-      toast.error("File size should be less than 15MB");
-      return;
-    }
-
-    const updatedPlans = [...floorPlans];
-    updatedPlans[index] = {
-      ...updatedPlans[index],
-      brochureLink: file.name,
-      brochureFile: file, // Store the file object for form submission
-    };
-    setFloorPlans(updatedPlans);
-  };
-
-  const onSubmit = async (data: PropertyFormData) => {
-    if (selectedCommunity.length === 0) {
-      toast.error("At least one community should be selected");
-      return;
-    }
     if (selectedAmenities.length === 0) {
-      toast.error("At least one amenity should be selected");
-      return;
+      toast.error("At least one amenity should be selected")
+      return
     }
+    if (features.length === 0) {
+      toast.error("At least one feature is required")
+      return
+    }
+
     if (!isEditMode && !selectedMainImage) {
-      toast.error("Main image is required");
-      return;
+      toast.error("Main image is required")
+      return
     }
     if (!isEditMode && !selectedSecondaryImage) {
-      toast.error("Secondary image is required");
-      return;
+      toast.error("Secondary image is required")
+      return
     }
     if (!isEditMode && sliderImages.length === 0) {
-      toast.error("At least one slider image is required");
-      return;
-    }
-
-    if (!selectedPropertyType) {
-      toast.error("Property type must be selected");
-      return;
+      toast.error("At least one slider image is required")
+      return
     }
 
     if (locationHighlights.length > 0) {
       const locationHighlightsValid = locationHighlights.every(
         (highlight: any) =>
-          highlight.title.trim() !== "" &&
-          highlight.time.trim() !== "" &&
-          (highlight.image ? true : false),
-      );
+          highlight.title.trim() !== "" && highlight.time.trim() !== "" && (highlight.image ? true : false),
+      )
 
       if (!locationHighlightsValid) {
-        toast.error(
-          "All location highlights must have title, travel time, and valid image (max 5MB)",
-        );
-        return;
-      }
-    }
-
-    if (floorPlans.length > 0) {
-      const floorPlansValid = floorPlans.every((plan) =>
-        plan.title.trim() !== "" &&
-        plan.totalSquareFeet.trim() !== "" &&
-        plan.image
-          ? true
-          : false && plan.brochureLink
-            ? true
-            : false,
-      );
-
-      if (!floorPlansValid) {
-        toast.error(
-          "All floor plans must have title, total square feet, valid image (max 5MB), and valid brochure (max 10MB)",
-        );
-        return;
-      }
-    }
-    if (!(selectedBrochure || selectedFloorPlan || selectedMasterPlan)) {
-      if (
-        !(
-          property?.downloads?.brochure ||
-          property?.downloads?.floorPlan ||
-          property?.downloads?.masterPlan
-        )
-      ) {
-        toast.error("Upload at least one Download");
-        return;
+        toast.error("All location highlights must have title, travel time, and valid image (max 5MB)")
+        return
       }
     }
 
     if (faqs.length === 0) {
-      toast.error("At least one FAQ is required");
-      return;
+      toast.error("At least one FAQ is required")
+      return
     }
 
-    setIsSubmitting(true);
-    setImageError(null);
+    // Validate development section
+    if (!data.development.title1 || !data.development.title2 || !data.development.title3) {
+      toast.error("All development titles are required")
+      return
+    }
+
+    if (!isEditMode && (!developmentImage1Preview || !developmentImage2Preview)) {
+      toast.error("Both development images are required")
+      return
+    }
+
+    setIsSubmitting(true)
+    setImageError(null)
 
     try {
-      const formDataToSend = new FormData();
+      const formDataToSend = new FormData()
 
       // Add basic fields
-      formDataToSend.append("title", data.title);
-      formDataToSend.append("price", data.price);
-      formDataToSend.append("paymentPlan", data.paymentPlan);
-      formDataToSend.append("completion", data.completion);
-      formDataToSend.append("installments", data.installments);
-      formDataToSend.append("downPayment", data.downPayment);
-      formDataToSend.append("paymentStructure", data.paymentStructure);
-      formDataToSend.append("bedrooms", data.bedrooms);
-      formDataToSend.append("handover", data.handover);
-      formDataToSend.append("areaSize", data.areaSize);
-      formDataToSend.append("developer", data.developer);
-      formDataToSend.append("unit", data.unit);
-      formDataToSend.append("propertyType", selectedPropertyType);
-      formDataToSend.append("community", selectedCommunity);
-      formDataToSend.append("description", data.description);
-      formDataToSend.append("locationDescription", data.locationDescription);
-      formDataToSend.append("country", data.location.country);
-      formDataToSend.append("about", data.about);
-      formDataToSend.append("agentId", data.agentId);
-      if (
-        "latitude" in data.location &&
-        typeof data.location.latitude === "number"
-      ) {
-        formDataToSend.append("latitude", data.location.latitude.toString());
-      }
-      if (
-        "longitude" in data.location &&
-        typeof data.location.longitude === "number"
-      ) {
-        formDataToSend.append("longitude", data.location.longitude.toString());
-      }
-      formDataToSend.append("youtubeVideo", data.youtubeVideo || "");
+      formDataToSend.append("title", data.title)
+      formDataToSend.append("price", data.price)
+      formDataToSend.append("paymentPlan", data.paymentPlan)
+      formDataToSend.append("handover", data.handover)
+      formDataToSend.append("paymentStructure", data.paymentStructure)
+      formDataToSend.append("downPayment", data.downPayment)
+      formDataToSend.append("bedrooms", data.bedrooms)
+      formDataToSend.append("area", data.area)
+      formDataToSend.append("developer", data.developer)
+      formDataToSend.append("unit", data.unit)
+      formDataToSend.append("description", data.description)
+      formDataToSend.append("locationDescription", data.locationDescription)
+      formDataToSend.append("country", data.location.country)
+      formDataToSend.append("paymentDescription", data.paymentDescription)
+      formDataToSend.append("bookingPercentage", data.bookingPercentage)
+      formDataToSend.append("constructionPercentage", data.constructionPercentage)
+      formDataToSend.append("handOverPercentage", data.handOverPercentage)
+      formDataToSend.append("isAffordable", data.isAffordable ? "true" : "false")
+      formDataToSend.append("isLuxury", data.isLuxury ? "true" : "false")
+      formDataToSend.append("isExclusive", data.isExclusive ? "true" : "false")
 
-      // Add amenities
+      // Development titles
+      formDataToSend.append("development[title1]", data.development.title1)
+      formDataToSend.append("development[title2]", data.development.title2)
+      formDataToSend.append("development[title3]", data.development.title3)
+
+      if ("latitude" in data.location && typeof data.location.latitude === "number") {
+        formDataToSend.append("latitude", data.location.latitude.toString())
+      }
+      if ("longitude" in data.location && typeof data.location.longitude === "number") {
+        formDataToSend.append("longitude", data.location.longitude.toString())
+      }
+
+      // Add amenities and features
       selectedAmenities.forEach((amenityId) => {
-        formDataToSend.append("amenities[]", amenityId);
-      });
+        formDataToSend.append("amenities[]", amenityId)
+      })
+
+      // Add features
+      features.forEach((feature) => {
+        formDataToSend.append("features[]", feature)
+      })
 
       // Add images
       if (selectedMainImage) {
-        formDataToSend.append("mainImage", selectedMainImage);
+        formDataToSend.append("mainImage", selectedMainImage)
       }
 
       if (selectedSecondaryImage) {
-        formDataToSend.append("secondaryImage", selectedSecondaryImage);
+        formDataToSend.append("secondaryImage", selectedSecondaryImage)
       }
 
       if (isEditMode) {
         if (existingSliderImages.length > 0) {
-          const normalizedImages = existingSliderImages
-            .flat()
-            .filter((img) => typeof img === "string");
-          formDataToSend.append(
-            "existingSliderImages",
-            JSON.stringify(normalizedImages),
-          );
+          const normalizedImages = existingSliderImages.flat().filter((img) => typeof img === "string")
+          formDataToSend.append("existingSliderImages", JSON.stringify(normalizedImages))
         }
 
         selectedSliderImages.forEach((file) => {
-          formDataToSend.append("sliderImages", file);
-        });
+          formDataToSend.append("sliderImages", file)
+        })
       } else {
         selectedSliderImages.forEach((file) => {
-          formDataToSend.append("sliderImages", file);
-        });
+          formDataToSend.append("sliderImages", file)
+        })
       }
 
-      // Add download files
-      if (selectedBrochure) {
-        formDataToSend.append("brochure", selectedBrochure);
+      // Add document files and images
+      if (brochureFile) {
+        formDataToSend.append("brochure[url]", brochureFile)
+      }
+      if (brochureImageFile) {
+        formDataToSend.append("brochure[image]", brochureImageFile)
       }
 
-      if (selectedFloorPlan) {
-        formDataToSend.append("floorPlan", selectedFloorPlan);
+      if (priceListFile) {
+        formDataToSend.append("priceList[url]", priceListFile)
+      }
+      if (priceListImageFile) {
+        formDataToSend.append("priceList[image]", priceListImageFile)
       }
 
-      if (selectedMasterPlan) {
-        formDataToSend.append("masterPlan", selectedMasterPlan);
+      if (paymentFile) {
+        formDataToSend.append("payment[url]", paymentFile)
+      }
+      if (paymentImageFile) {
+        formDataToSend.append("payment[image]", paymentImageFile)
+      }
+
+      // Add development images
+      if (developmentImage1File) {
+        formDataToSend.append("development[image1]", developmentImage1File)
+      }
+      if (developmentImage2File) {
+        formDataToSend.append("development[image2]", developmentImage2File)
       }
 
       // Add location highlights
       formDataToSend.append(
         "locationHighlights",
-        JSON.stringify(
-          locationHighlights.map(
-            ({ imageFile, ...highlight }: any) => highlight,
-          ),
-        ),
-      );
+        JSON.stringify(locationHighlights.map(({ imageFile, ...highlight }: any) => highlight)),
+      )
 
       // Add location highlight images
       locationHighlights.forEach((highlight: any, index: number) => {
         if (highlight.imageFile) {
-          formDataToSend.append(`locationImages_${index}`, highlight.imageFile);
+          formDataToSend.append(`locationImages_${index}`, highlight.imageFile)
         }
-      });
-
-      // Add floor plans
-      formDataToSend.append(
-        "floorPlans",
-        JSON.stringify(
-          floorPlans.map(({ imageFile, brochureFile, ...plan }) => plan),
-        ),
-      );
-
-      // Add floor plan images and brochures
-      floorPlans.forEach((plan, index) => {
-        if (plan.imageFile) {
-          formDataToSend.append(`floorPlanImages_${index}`, plan.imageFile);
-        }
-        if (plan.brochureFile) {
-          formDataToSend.append(
-            `floorPlanBrochure_${index}`,
-            plan.brochureFile,
-          );
-        }
-      });
+      })
 
       // Add FAQs
       faqs.forEach((faq, index) => {
         if (faq._id) {
-          formDataToSend.append(`faqs[${index}][_id]`, faq._id);
+          formDataToSend.append(`faqs[${index}][_id]`, faq._id)
         }
-        formDataToSend.append(`faqs[${index}][question]`, faq.question);
-        formDataToSend.append(`faqs[${index}][answer]`, faq.answer);
-      });
+        formDataToSend.append(`faqs[${index}][question]`, faq.question)
+        formDataToSend.append(`faqs[${index}][answer]`, faq.answer)
+      })
 
       // Add removed FAQ IDs if in edit mode
       if (isEditMode && removedFaqIds.length > 0) {
         removedFaqIds.forEach((id) => {
-          formDataToSend.append("removedFaqIds", id);
-        });
+          formDataToSend.append("removedFaqIds", id)
+        })
       }
 
       if (isEditMode) {
@@ -734,35 +689,33 @@ const PropertyForm = ({
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        });
-        toast.success("Property updated successfully!");
+        })
+        toast.success("Property updated successfully!")
       } else {
         // Create new property
         await axiosInstance.post("/property", formDataToSend, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        });
-        toast.success("Property added successfully!");
+        })
+        toast.success("Property added successfully!")
       }
 
       // Redirect to properties list page
-      router.push("/admin/property");
-      router.refresh();
+      router.push("/admin/property")
+      router.refresh()
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error submitting form:", error)
       toast.error(
-        isEditMode
-          ? "Failed to update property. Please try again."
-          : "Failed to add property. Please try again.",
-      );
+        isEditMode ? "Failed to update property. Please try again." : "Failed to add property. Please try again.",
+      )
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   if (!isMounted) {
-    return null;
+    return null
   }
 
   return (
@@ -770,23 +723,8 @@ const PropertyForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Basic Information */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">
-            Basic Information
-          </h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Basic Information</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-1">
-            <select
-              className="col-span-full w-full rounded-md border border-gray-300 px-3 py-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              value={selectedCommunity}
-              onChange={(e) => handleCommunityChange(e.target.value)}
-            >
-              <option value="">Select Community</option>
-              {communityData.map((type) => (
-                <option key={type._id} value={type._id}>
-                  {type.title}
-                </option>
-              ))}
-            </select>
-
             <InputGroup
               label="Title"
               placeholder="Enter property title"
@@ -798,41 +736,6 @@ const PropertyForm = ({
               error={errors.title?.message}
             />
           </div>
-          <div>
-            <div className="mb-4.5">
-
-                <>
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Select Agent
-                  </label>
-                  <Select
-                    value={watch("agentId") || ""}
-                    onValueChange={handleAgentChange}
-                  >
-                    <SelectTrigger
-                      className={`dark:border-form-strokedark dark:bg-form-input w-full rounded border border-stroke py-3 pl-4.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:text-white dark:focus:border-primary ${
-                        errors.agentId ? "border-red-500" : ""
-                      }`}
-                    >
-                      <SelectValue placeholder="Select agent" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {agentData.map((agent: any) => (
-                        <SelectItem key={agent._id} value={agent._id}>
-                          {agent.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.agentId && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.agentId.message}
-                    </p>
-                  )}
-                </>
-            </div>
-          </div>
-
           <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
             <InputGroup
               label="Price"
@@ -865,29 +768,6 @@ const PropertyForm = ({
               error={errors.paymentStructure?.message}
             />
             <InputGroup
-              label="Completion"
-              placeholder="Enter completion date/status"
-              type="text"
-              name="completion"
-              value={watch("completion")}
-              handleChange={() => {}}
-              register={register}
-              error={errors.completion?.message}
-            />
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <InputGroup
-              label="Installments"
-              placeholder="Enter installments details"
-              type="text"
-              name="installments"
-              value={watch("installments")}
-              handleChange={() => {}}
-              register={register}
-              error={errors.installments?.message}
-            />
-            <InputGroup
               label="Down Payment"
               placeholder="Enter down payment details"
               type="text"
@@ -896,6 +776,39 @@ const PropertyForm = ({
               handleChange={() => {}}
               register={register}
               error={errors.downPayment?.message}
+            />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <InputGroup
+              label="Booking Percentage"
+              placeholder="Enter booking percentage"
+              type="text"
+              name="bookingPercentage"
+              value={watch("bookingPercentage")}
+              handleChange={() => {}}
+              register={register}
+              error={errors.bookingPercentage?.message}
+            />
+            <InputGroup
+              label="Construction Percentage"
+              placeholder="Enter construction percentage"
+              type="text"
+              name="constructionPercentage"
+              value={watch("constructionPercentage")}
+              handleChange={() => {}}
+              register={register}
+              error={errors.constructionPercentage?.message}
+            />
+            <InputGroup
+              label="Handover Percentage"
+              placeholder="Enter handover percentage"
+              type="text"
+              name="handOverPercentage"
+              value={watch("handOverPercentage")}
+              handleChange={() => {}}
+              register={register}
+              error={errors.handOverPercentage?.message}
             />
           </div>
 
@@ -921,14 +834,14 @@ const PropertyForm = ({
               error={errors.handover?.message}
             />
             <InputGroup
-              label="Area Size"
+              label="Area"
               placeholder="Enter area size"
               type="text"
-              name="areaSize"
-              value={watch("areaSize")}
+              name="area"
+              value={watch("area")}
               handleChange={() => {}}
               register={register}
-              error={errors.areaSize?.message}
+              error={errors.area?.message}
             />
           </div>
 
@@ -953,30 +866,6 @@ const PropertyForm = ({
               register={register}
               error={errors.unit?.message}
             />
-            <div className="space-y-2">
-              <label className="text-body-sm font-medium text-dark dark:text-white">
-                Property Type{" "}
-                <span className="ml-1 select-none text-red">*</span>
-              </label>
-              <select
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                value={selectedPropertyType}
-                onChange={(e) => handlePropertyTypeChange(e.target.value)}
-              >
-                <option value="">Select Property Type</option>
-                {propertyTypes.map((type) => (
-                  <option key={type._id} value={type._id}>
-                    {type.title}
-                  </option>
-                ))}
-              </select>
-
-              {errors.propertyType && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.propertyType.message}
-                </p>
-              )}
-            </div>
           </div>
 
           <div className="mt-4">
@@ -991,13 +880,66 @@ const PropertyForm = ({
               error={errors.description?.message}
             />
           </div>
+
+          <div className="mt-4">
+            <TextArea
+              type="text"
+              label="Payment Description"
+              placeholder="Enter payment description"
+              name="paymentDescription"
+              value={watch("paymentDescription")}
+              handleChange={() => {}}
+              register={register}
+              error={errors.paymentDescription?.message}
+            />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isAffordable"
+                checked={watch("isAffordable")}
+                onCheckedChange={() => handleCheckboxChange("isAffordable")}
+              />
+              <label
+                htmlFor="isAffordable"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+              >
+                Is Affordable
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isLuxury"
+                checked={watch("isLuxury")}
+                onCheckedChange={() => handleCheckboxChange("isLuxury")}
+              />
+              <label
+                htmlFor="isLuxury"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+              >
+                Is Luxury
+              </label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isExclusive"
+                checked={watch("isExclusive")}
+                onCheckedChange={() => handleCheckboxChange("isExclusive")}
+              />
+              <label
+                htmlFor="isExclusive"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+              >
+                Is Exclusive
+              </label>
+            </div>
+          </div>
         </ShowcaseSection>
 
         {/* Property Images */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">
-            Property Images
-          </h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Property Images</h2>
 
           {/* Main Image */}
           <div className="mb-6">
@@ -1014,24 +956,29 @@ const PropertyForm = ({
               {mainImagePreview && (
                 <div className="relative w-full max-w-[200px]">
                   <Image
-                    src={mainImagePreview}
+                    src={mainImagePreview || "/placeholder.svg"}
                     alt="Main Image Preview"
                     width={200}
                     height={150}
                     className="rounded-lg"
                   />
+                  <button
+                    type="button"
+                    onClick={() => removeImage("main")}
+                    className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                  >
+                    <XCircle size={20} />
+                  </button>
                 </div>
               )}
             </div>
-            {imageError && (
-              <p className="mt-1 text-sm text-red-500">{imageError}</p>
-            )}
+            {imageError && <p className="mt-1 text-sm text-red-500">{imageError}</p>}
           </div>
 
           {/* Secondary Image */}
           <div className="mb-6">
             <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-              Secondary Image
+              Secondary Image <span className="ml-1 select-none text-red">*</span>
             </label>
             <div className="flex flex-col gap-4">
               <input
@@ -1043,12 +990,19 @@ const PropertyForm = ({
               {secondaryImagePreview && (
                 <div className="relative w-full max-w-[200px]">
                   <Image
-                    src={secondaryImagePreview}
+                    src={secondaryImagePreview || "/placeholder.svg"}
                     alt="Secondary Image Preview"
                     width={200}
                     height={150}
                     className="rounded-lg"
                   />
+                  <button
+                    type="button"
+                    onClick={() => removeImage("secondary")}
+                    className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                  >
+                    <XCircle size={20} />
+                  </button>
                 </div>
               )}
             </div>
@@ -1057,7 +1011,7 @@ const PropertyForm = ({
           {/* Slider Images */}
           <div className="mb-6">
             <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-              Slider Images
+              Slider Images <span className="ml-1 select-none text-red">*</span>
             </label>
             <div className="flex flex-col gap-4">
               <input
@@ -1071,21 +1025,19 @@ const PropertyForm = ({
                 {sliderImages.map((image, index) => (
                   <div key={index} className="relative">
                     <Image
-                      src={image}
+                      src={image || "/placeholder.svg"}
                       alt={`Slider Image ${index + 1}`}
                       width={200}
                       height={150}
                       className="rounded-lg"
                     />
-                    {sliderImages.length !== 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeImage("slider", index)}
-                        className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
-                      >
-                        <XCircle size={20} />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage("slider", index)}
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                    >
+                      <XCircle size={20} />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -1095,57 +1047,61 @@ const PropertyForm = ({
 
         {/* Amenities */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-gray-5">Amenities</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">Amenities</h2>
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {amenitiesData.map((amenity) => {
-              const Icon = LucideIcons[
-                amenity.iconName as keyof typeof LucideIcons
-              ] as React.ComponentType<any>;
+              const Icon = LucideIcons[amenity.iconName as keyof typeof LucideIcons] as React.ComponentType<any>
 
               return (
                 <div
                   key={amenity._id}
                   className="relative flex flex-col items-center justify-center rounded-lg border border-gray-500 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800"
                 >
-                  {/* Checkbox top-right */}
                   <Checkbox
-                    id={amenity._id}
+                    id={`amenity-${amenity._id}`}
                     className="absolute right-2 top-2"
                     checked={selectedAmenities.includes(amenity._id)}
                     onCheckedChange={() => handleAmenityChange(amenity._id)}
                   />
 
-                  {/* Icon */}
                   <div className="mb-3">
                     {Icon ? (
-                      <Icon
-                        size={36}
-                        className="text-gray-700 dark:text-gray-500"
-                      />
+                      <Icon size={36} className="text-gray-700 dark:text-gray-500" />
                     ) : (
                       <span className="text-gray-500">❓</span>
                     )}
                   </div>
 
-                  {/* Title */}
                   <label
-                    htmlFor={amenity._id}
+                    htmlFor={`amenity-${amenity._id}`}
                     className="text-center text-sm font-medium text-gray-800 dark:text-gray-200"
                   >
                     {amenity.title}
                   </label>
                 </div>
-              );
+              )
             })}
           </div>
 
-          {/* Error message */}
-          {errors.amenities && (
-            <p className="mt-2 text-sm text-red-500">
-              {errors.amenities.message}
-            </p>
-          )}
+          {errors.amenities && <p className="mt-2 text-sm text-red-500">{errors.amenities.message}</p>}
+        </ShowcaseSection>
+
+        {/* Features */}
+        <ShowcaseSection>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-white">Features</h2>
+          </div>
+
+          <FeatureInput
+            onFeatureChange={(updatedFeatures:any) => {
+              setFeatures(updatedFeatures)
+              setValue("features", updatedFeatures)
+            }}
+            initialFeatures={features}
+          />
+
+          {errors.features && <p className="mt-2 text-sm text-red-500">{errors.features.message}</p>}
         </ShowcaseSection>
 
         {/* Location */}
@@ -1175,9 +1131,7 @@ const PropertyForm = ({
           {/* Location Highlights */}
           <div className="mt-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-white">
-                Location Highlights
-              </h3>
+              <h3 className="text-lg font-medium text-white">Location Highlights</h3>
               <Button
                 type="button"
                 onClick={handleAddLocationHighlight}
@@ -1189,14 +1143,9 @@ const PropertyForm = ({
             </div>
 
             {locationHighlights.map((highlight: any, index: number) => (
-              <div
-                key={index}
-                className="mb-4 rounded-lg border border-gray-700 p-4"
-              >
+              <div key={index} className="mb-4 rounded-lg border border-gray-700 p-4">
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-md font-medium text-white">
-                    Highlight {index + 1}
-                  </h4>
+                  <h4 className="text-md font-medium text-white">Highlight {index + 1}</h4>
                   <Button
                     type="button"
                     onClick={() => handleRemoveLocationHighlight(index)}
@@ -1214,13 +1163,7 @@ const PropertyForm = ({
                     type="text"
                     name={`locationHighlight-${index}-title`}
                     value={highlight.title}
-                    handleChange={(e) =>
-                      handleUpdateLocationHighlight(
-                        index,
-                        "title",
-                        e.target.value,
-                      )
-                    }
+                    handleChange={(e) => handleUpdateLocationHighlight(index, "title", e.target.value)}
                     register={() => {}}
                   />
                   <InputGroup
@@ -1229,21 +1172,13 @@ const PropertyForm = ({
                     type="text"
                     name={`locationHighlight-${index}-time`}
                     value={highlight.time}
-                    handleChange={(e) =>
-                      handleUpdateLocationHighlight(
-                        index,
-                        "time",
-                        e.target.value,
-                      )
-                    }
+                    handleChange={(e) => handleUpdateLocationHighlight(index, "time", e.target.value)}
                     register={() => {}}
                   />
                 </div>
 
                 <div className="mt-4">
-                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                    Image
-                  </label>
+                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Image</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -1253,7 +1188,7 @@ const PropertyForm = ({
                   {highlight.image && (
                     <div className="mt-2">
                       <Image
-                        src={highlight.image}
+                        src={highlight.image || "/placeholder.svg"}
                         alt={`Location Highlight ${index + 1}`}
                         width={100}
                         height={75}
@@ -1267,196 +1202,261 @@ const PropertyForm = ({
           </div>
         </ShowcaseSection>
 
-        {/* Floor Plans */}
+        {/* Documents */}
         <ShowcaseSection>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Floor Plans</h2>
-            <Button
-              type="button"
-              onClick={handleAddFloorPlan}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Plus size={16} /> Add Floor Plan
-            </Button>
+          <h2 className="mb-4 text-xl font-semibold text-white">Documents</h2>
+
+          {/* Brochure */}
+          <div className="mb-6">
+            <h3 className="mb-3 text-lg font-medium text-white">Brochure</h3>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Brochure File</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleFileChange(e, "brochure")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+                {property?.brochure?.url && (
+                  <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
+                    Current file: {property.brochure.url}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Brochure Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, "brochureImage")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+                {brochureImagePreview && (
+                  <div className="relative mt-2 w-full max-w-[200px]">
+                    <Image
+                      src={brochureImagePreview || "/placeholder.svg"}
+                      alt="Brochure Image Preview"
+                      width={200}
+                      height={150}
+                      className="rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage("brochureImage")}
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                    >
+                      <XCircle size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          {floorPlans.map((plan, index) => (
-            <div
-              key={index}
-              className="mb-4 rounded-lg border border-gray-700 p-4"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h4 className="text-md font-medium text-white">
-                  Floor Plan {index + 1}
-                </h4>
-                <Button
-                  type="button"
-                  onClick={() => handleRemoveFloorPlan(index)}
-                  variant="destructive"
-                  size="sm"
-                >
-                  <XCircle size={16} />
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputGroup
-                  label="Title"
-                  placeholder="Enter floor plan title"
-                  type="text"
-                  name={`floorPlan-${index}-title`}
-                  value={plan.title}
-                  handleChange={(e) =>
-                    handleUpdateFloorPlan(index, "title", e.target.value)
-                  }
-                  register={() => {}}
+          {/* Price List */}
+          <div className="mb-6">
+            <h3 className="mb-3 text-lg font-medium text-white">Price List</h3>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Price List File</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleFileChange(e, "priceList")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
-                <InputGroup
-                  label="Total Square Feet"
-                  placeholder="Enter total square feet"
-                  type="text"
-                  name={`floorPlan-${index}-totalSquareFeet`}
-                  value={plan.totalSquareFeet}
-                  handleChange={(e) =>
-                    handleUpdateFloorPlan(
-                      index,
-                      "totalSquareFeet",
-                      e.target.value,
-                    )
-                  }
-                  register={() => {}}
+                {property?.priceList?.url && (
+                  <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
+                    Current file: {property.priceList.url}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Price List Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, "priceListImage")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 />
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                    Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFloorPlanImageChange(index, e)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                  {plan.image && (
-                    <div className="mt-2">
-                      <Image
-                        src={plan.image}
-                        alt={`Floor Plan ${index + 1}`}
-                        width={100}
-                        height={75}
-                        className="rounded-lg"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                    Brochure
-                  </label>
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={(e) => handleFloorPlanBrochureChange(index, e)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                  {plan.brochureLink && (
-                    <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
-                      Current file: {plan.brochureLink}
-                    </p>
-                  )}
-                </div>
+                {priceListImagePreview && (
+                  <div className="relative mt-2 w-full max-w-[200px]">
+                    <Image
+                      src={priceListImagePreview || "/placeholder.svg"}
+                      alt="Price List Image Preview"
+                      width={200}
+                      height={150}
+                      className="rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage("priceListImage")}
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                    >
+                      <XCircle size={20} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-        </ShowcaseSection>
+          </div>
 
-        {/* Downloads */}
-        <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">Downloads</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div>
-              <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                Brochure
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => handleFileChange(e, "brochure")}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              />
-              {property?.downloads?.brochure && (
-                <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
-                  Current file: {property.downloads.brochure}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                Floor Plan
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => handleFileChange(e, "floorPlan")}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              />
-              {property?.downloads?.floorPlan && (
-                <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
-                  Current file: {property.downloads.floorPlan}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-                Master Plan
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) => handleFileChange(e, "masterPlan")}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              />
-              {property?.downloads?.masterPlan && (
-                <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
-                  Current file: {property.downloads.masterPlan}
-                </p>
-              )}
+          {/* Payment */}
+          <div className="mb-6">
+            <h3 className="mb-3 text-lg font-medium text-white">Payment</h3>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Payment File</label>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => handleFileChange(e, "payment")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+                {property?.payment?.url && (
+                  <p className="mt-2 max-w-xl overflow-hidden overflow-ellipsis whitespace-nowrap text-sm text-gray-300">
+                    Current file: {property.payment.url}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Payment Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, "paymentImage")}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                />
+                {paymentImagePreview && (
+                  <div className="relative mt-2 w-full max-w-[200px]">
+                    <Image
+                      src={paymentImagePreview || "/placeholder.svg"}
+                      alt="Payment Image Preview"
+                      width={200}
+                      height={150}
+                      className="rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage("paymentImage")}
+                      className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                    >
+                      <XCircle size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </ShowcaseSection>
 
-        {/* Media */}
+        {/* Development */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">Media</h2>
-          <div className="grid grid-cols-1 gap-6">
+          <h2 className="mb-4 text-xl font-semibold text-white">Development</h2>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <InputGroup
+                label="Title 1"
+                placeholder="Enter development title 1"
+                type="text"
+                name="development.title1"
+                value={watch("development.title1")}
+                handleChange={() => {}}
+                register={register}
+                error={errors.development?.title1?.message}
+              />
+            </div>
+            <div>
+              <InputGroup
+                label="Title 2"
+                placeholder="Enter development title 2"
+                type="text"
+                name="development.title2"
+                value={watch("development.title2")}
+                handleChange={() => {}}
+                register={register}
+                error={errors.development?.title2?.message}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4">
             <InputGroup
-              label="YouTube Video URL"
-              placeholder="Enter YouTube video URL"
+              label="Title 3"
+              placeholder="Enter development title 3"
               type="text"
-              name="youtubeVideo"
-              value={watch("youtubeVideo")}
+              name="development.title3"
+              value={watch("development.title3")}
               handleChange={() => {}}
               register={register}
-              error={errors.youtubeVideo?.message}
+              error={errors.development?.title3?.message}
             />
           </div>
 
-          <TextArea
-            label="About your property"
-            placeholder="Enter About details"
-            type="text"
-            name="about"
-            value={watch("about")}
-            handleChange={() => {}}
-            register={register}
-            error={errors.about?.message}
-          />
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                Development Image 1
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "developmentImage1")}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              {developmentImage1Preview && (
+                <div className="relative mt-2 w-full max-w-[200px]">
+                  <Image
+                    src={developmentImage1Preview || "/placeholder.svg"}
+                    alt="Development Image 1 Preview"
+                    width={200}
+                    height={150}
+                    className="rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage("developmentImage1")}
+                    className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                  >
+                    <XCircle size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                Development Image 2
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "developmentImage2")}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              {developmentImage2Preview && (
+                <div className="relative mt-2 w-full max-w-[200px]">
+                  <Image
+                    src={developmentImage2Preview || "/placeholder.svg"}
+                    alt="Development Image 2 Preview"
+                    width={200}
+                    height={150}
+                    className="rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage("developmentImage2")}
+                    className="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white"
+                  >
+                    <XCircle size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </ShowcaseSection>
 
         {/* FAQs */}
@@ -1475,9 +1475,9 @@ const PropertyForm = ({
 
           <FAQInput
             onFAQChange={(updatedFaqs, removedIds) => {
-              setFaqs(updatedFaqs);
+              setFaqs(updatedFaqs)
               if (removedIds) {
-                setRemovedFaqIds(removedIds);
+                setRemovedFaqIds(removedIds)
               }
             }}
             initialFaqs={property?.faqs || []}
@@ -1494,11 +1494,7 @@ const PropertyForm = ({
             Cancel
           </Button>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-1/2 py-6 text-lg text-white"
-          >
+          <Button type="submit" disabled={isSubmitting} className="w-1/2 py-6 text-lg text-white">
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1511,7 +1507,7 @@ const PropertyForm = ({
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default PropertyForm;
+export default PropertyForm

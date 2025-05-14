@@ -6,6 +6,9 @@ import PropertyPayment from "./_components/propertyPayment";
 import PropertyInfoRequest from "./_components/PropertyExpertContact";
 import PropertySlider from "./_components/propertySlider";
 import EnhancedFAQ from "./_components/faqSection";
+import LocationSection from "./_components/location";
+import ProjectMaterials from "./_components/ProjectMaterials";
+import DevelopmentSection from "./_components/development-section";
 
 // Sample data for PropertyLanding
 const propertyData = {
@@ -82,9 +85,73 @@ const propertyInfoRequestData = {
 };
 
 const sliderData = [
- "/images/dubaiharbour/sec-1.png",
-   "/images/dubaiharbour/sec-1.png",
-  "/images/dubaiharbour/sec-1.png",];
+  "/images/dubaiharbour/sec-1.png",
+  "/images/dubaiharbour/sec-1.png",
+  "/images/dubaiharbour/sec-1.png",
+];
+
+const locationData = [
+  {
+    _id: "1",
+    image: "/placeholder.svg?height=300&width=400",
+    time: "22 Minutes",
+    title: "Downtown Dubai",
+  },
+  {
+    _id: "2",
+    image: "/placeholder.svg?height=300&width=400",
+    time: "22 Minutes",
+    title: "DXB Airport",
+  },
+  {
+    _id: "3",
+    image: "/placeholder.svg?height=300&width=400",
+    time: "22 Minutes",
+    title: "DWC Airport",
+  },
+  {
+    _id: "4",
+    image: "/placeholder.svg?height=300&width=400",
+    time: "22 Minutes",
+    title: "Dubai Marina",
+  },
+];
+
+// Dummy location description
+const locationDescription = `Located in the heart of Dubai, this development offers the perfect balance of convenience, accessibility, and luxury living. This vibrant complex is situated in a prime area, close to major landmarks, amenities, and transportation hubs.\n\nAl Muteena Street is nestled in a thriving community, with easy access to major city attractions and essential services. The neighborhood features high-end residential options, from spacious apartments to luxurious villas. Residents and visitors can enjoy a variety of amenities, including shopping centers, restaurants, cafes, parks, and recreational facilities.`;
+
+// Map image URL
+const mapImageUrl = "/placeholder.svg?height=600&width=1200";
+
+const projectMaterials = [
+  {
+    id: "1",
+    title: "Download Brochure",
+    image: "/images/dubaiharbour/sec-1.png",
+    downloadUrl: "/brochure.pdf",
+  },
+  {
+    id: "2",
+    title: "Download Price List",
+    image: "/images/dubaiharbour/sec-1.png",
+    downloadUrl: "/price-list.pdf",
+  },
+  {
+    id: "3",
+    title: "Download Payment Plan",
+    image: "/images/dubaiharbour/sec-1.png",
+    downloadUrl: "/payment-plan.pdf",
+  },
+];
+
+const developmentTitle = "DIFC Developments";
+const developmentDescription =
+  "Dubai International Financial Centre (DIFC), the leading global financial centre in the Middle East, Africa, and South Asia (MEASA) region, today announced that sales of residential spaces in Heights Tower, a new mixed-use live-work-play destination reimagining urban luxury living, will commence from 16 April 2025.";
+const secondDescription =
+  "Heights Tower, a project by DIFC Developments occupies the final plot within the original DIFC district. It will provide an exclusive address within the Centre's ever-growing international community.";
+const valueStatement =
+  "Rooted in our mission and vision, our values of define our actions, sh Resilience, Ownership, Customer satisfaction, Innovation, and Sustainability ape our identity, and guide us on our journey to seek the extraordinary.";
+const developmentImages = ["/images/dubaiharbour/sec-1.png", "/images/dubaiharbour/sec-1.png"];
 
 export default function Page() {
   return (
@@ -93,18 +160,55 @@ export default function Page() {
       <PropertySection2 propertyData={samplePropertyData} />
       <AmenitiesGrid amenitiesData={sampleAmenities} />
       <PropertyPayment />
-      <PropertyInfoRequest
-        id={propertyInfoRequestData.id}
-        title={propertyInfoRequestData.title}
-        description={propertyInfoRequestData.description}
-        contactName={propertyInfoRequestData.contactName}
-        contactPosition={propertyInfoRequestData.contactPosition}
-        contactPhone={propertyInfoRequestData.contactPhone}
-        imageSrc={propertyInfoRequestData.imageSrc}
-        agentId={propertyInfoRequestData.agentId}
-      />
+
+      <div className="w-full bg-gray-50 py-12 md:py-16">
+        <div className="containers mx-auto">
+          <PropertyInfoRequest
+            id={propertyInfoRequestData.id}
+            title={propertyInfoRequestData.title}
+            description={propertyInfoRequestData.description}
+            contactName={propertyInfoRequestData.contactName}
+            contactPosition={propertyInfoRequestData.contactPosition}
+            contactPhone={propertyInfoRequestData.contactPhone}
+            imageSrc={propertyInfoRequestData.imageSrc}
+            agentId={propertyInfoRequestData.agentId}
+          />
+        </div>
+      </div>
       <PropertySlider slides={sliderData} />
-      <EnhancedFAQ/>
+      <LocationSection
+        location={locationData}
+        locationDescription={locationDescription}
+        mapImageUrl={mapImageUrl}
+      />
+      <ProjectMaterials materials={projectMaterials} />
+
+      <div className="containers w-full py-12 md:py-16">
+        <div className="mx-auto rounded-3xl bg-gray-50 p-12">
+          <PropertyInfoRequest
+            id={propertyInfoRequestData.id}
+            title={propertyInfoRequestData.title}
+            description={propertyInfoRequestData.description}
+            contactName={propertyInfoRequestData.contactName}
+            contactPosition={propertyInfoRequestData.contactPosition}
+            contactPhone={propertyInfoRequestData.contactPhone}
+            imageSrc={propertyInfoRequestData.imageSrc}
+            agentId={propertyInfoRequestData.agentId}
+          />
+        </div>
+      </div>
+
+      <div>
+        <DevelopmentSection
+          title={developmentTitle}
+          description={developmentDescription}
+          secondDescription={secondDescription}
+          valueStatement={valueStatement}
+          images={developmentImages}
+        />
+      </div>
+
+      <EnhancedFAQ />
     </div>
   );
 }

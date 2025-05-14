@@ -23,7 +23,7 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "Off Plan Properties",
+        title: "Properties",
         url: "/admin/property",
         icon: Icons.PropertyIcon,
         items: [],
@@ -51,12 +51,6 @@ export const NAV_DATA = [
         title: "Property Type",
         url: "/admin/property-type",
         icon: Icons.PropertyIcon,
-        items: [],
-      },
-      {
-        title: "Careers",
-        url: "/admin/career",
-        icon: Icons.CareerIcon,
         items: [],
       },
       {
