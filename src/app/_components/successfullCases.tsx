@@ -104,8 +104,8 @@ export default function SuccessfulCases() {
   }
 
   return (
-    <section className="py-16 bg-gray-50 max-w-[110rem] px-[5%] mx-auto">
-      <div className="container mx-auto ">
+    <section className="my-20 py-20 bg-gray-50 ">
+      <div className="container mx-auto max-w-[110rem] px-[5%] ">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl md:text-4xl font-serif">Successful Cases</h2>
           <div className="flex gap-2">

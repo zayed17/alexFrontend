@@ -30,6 +30,7 @@ const config: Config = {
           800: '#826A19',
           900: '#5C4A0E',
         },
+        customBlue:"#071C35",
       'custom-border': 'rgba(7, 28, 53, 0.2)', 
         current: "currentColor",
         transparent: "transparent",

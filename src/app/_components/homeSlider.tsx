@@ -102,7 +102,7 @@ export default function PropertyGallerySlider() {
 
 
         {/* Navigation arrows */}
-        <div className="absolute bottom-8 right-[47%] flex space-x-4">
+        <div className="absolute bottom-8 right-[34%] md:right-[47%] flex space-x-4">
           <button
             onClick={goToPrevious}
             disabled={isTransitioning}

@@ -47,7 +47,7 @@ const reasons = [
 
 const ReasonsToInvest = () => {
   return (
-    <div className="containers mx-auto !py-12 px-4">
+    <div className="containers mx-auto !py-20 px-4">
       {/* Title */}
       <div className="mb-8 flex justify-between border-b border-[#DDDDDD] items-center ">
         <p className="mb-10   font-presto text-2xl font-bold text-[#071C35] md:text-3xl lg:text-[40px]">
