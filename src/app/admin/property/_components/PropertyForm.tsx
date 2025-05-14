@@ -612,7 +612,7 @@ console.log("Features:", features);
       if (isEditMode) {
         if (existingSliderImages.length > 0) {
           const normalizedImages = existingSliderImages.flat().filter((img) => typeof img === "string")
-          formDataToSend.append("existingSliderImages", JSON.stringify(normalizedImages))
+          formDataToSend.append("sliderImages", JSON.stringify(normalizedImages))
         }
 
         selectedSliderImages.forEach((file) => {
@@ -626,32 +626,32 @@ console.log("Features:", features);
 
       // Add document files and images
       if (brochureFile) {
-        formDataToSend.append("brochure[url]", brochureFile)
+        formDataToSend.append("brochureUrl", brochureFile)
       }
       if (brochureImageFile) {
-        formDataToSend.append("brochure[image]", brochureImageFile)
+        formDataToSend.append("brochureImage", brochureImageFile)
       }
 
       if (priceListFile) {
-        formDataToSend.append("priceList[url]", priceListFile)
+        formDataToSend.append("priceListUrl", priceListFile)
       }
       if (priceListImageFile) {
-        formDataToSend.append("priceList[image]", priceListImageFile)
+        formDataToSend.append("priceListImage", priceListImageFile)
       }
 
       if (paymentFile) {
-        formDataToSend.append("payment[url]", paymentFile)
+        formDataToSend.append("paymentUrl", paymentFile)
       }
       if (paymentImageFile) {
-        formDataToSend.append("payment[image]", paymentImageFile)
+        formDataToSend.append("paymentImage", paymentImageFile)
       }
 
       // Add development images
       if (developmentImage1File) {
-        formDataToSend.append("development[image1]", developmentImage1File)
+        formDataToSend.append("developmentImage1", developmentImage1File)
       }
       if (developmentImage2File) {
-        formDataToSend.append("development[image2]", developmentImage2File)
+        formDataToSend.append("developmentImage2", developmentImage2File)
       }
 
       // Add location highlights
