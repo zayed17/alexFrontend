@@ -132,8 +132,8 @@ export default function ContactFooter() {
       </div>
 
       {/* Bottom White Bar */}
-      <div className="bg-white px-4 py-6 shadow-inner">
-        <div className="mx-auto flex max-w-[110rem] flex-col items-center justify-between gap-4 text-sm text-gray-600 sm:flex-row">
+      <div className="bg-white  py-6 shadow-inner ">
+        <div className="mx-auto flex max-w-[110rem] containers flex-col items-center justify-between gap-4 text-sm text-gray-600 sm:flex-row">
           <div>Copyright © Alexeypavlenko 2025. All Right Reserved.</div>
 
           <div className="flex items-center justify-self-start">

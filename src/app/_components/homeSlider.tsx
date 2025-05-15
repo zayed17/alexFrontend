@@ -79,7 +79,7 @@ export default function PropertyGallerySlider() {
   }, [currentIndex])
 
   return (
-    <div className="relative mx-auto my-12 max-w-[110rem] px-[5%] overflow-hidden ">
+    <div className="relative mx-auto my-12 max-w-[110rem] containers overflow-hidden ">
       {/* Main image slider */}
       <div className="relative h-[500px] w-full  md:h-[600px]">
         {propertyImages.map((image, index) => (

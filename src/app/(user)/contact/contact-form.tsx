@@ -17,7 +17,7 @@ import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "react-toastify";
 
-export const revalidate = 1
+export const revalidate = 1;
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -58,25 +58,17 @@ export default function ContactForm() {
   }
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center pb-8 sm:pb-12 md:pb-17">
-      {/* Background Image with Text on Top */}
-      <div
-        className="bg-fill relative flex h-[300px] w-full flex-col items-center justify-center bg-cover bg-no-repeat px-4 sm:h-[400px] sm:px-6 md:h-[500px]"
-        style={{ backgroundImage: 'url("/images/contact/contact-bg.png")' }}
-      >
-        <div className="relative text-center font-presto sm:bottom-15 sm:right-30 sm:text-center md:right-0 md:text-left lg:right-30">
-          <h2 className="text-2xl font-semibold text-white sm:text-3xl md:text-4xl">
-            {`Let's Get In Touch`}
-          </h2>
-          <p className="text-base text-white sm:text-lg">
-            {`Reach out to us today and let's start building your dream together.
-              Your satisfaction is our priority.`}
-          </p>
-        </div>
+    <section className="items-center py-8 sm:py-12 md:py-17">
+      <div>
+        <h1 className="mb-2 text-center text-3xl font-medium font-presto">
+          Let's Get In Touch
+        </h1>
+        <p className="mb-12 text-center text-sm text-gray-600">
+          Reach out to us today and let's start building your dream together.
+          Your satisfaction is our priority.
+        </p>
       </div>
-
-      {/* Contact Form Section */}
-      <div className="relative z-10 mx-4 -mt-12 grid w-full max-w-5xl grid-cols-1 bg-white shadow-lg sm:mx-6 sm:-mt-24 sm:shadow-xl md:mx-auto md:-mt-50 md:grid-cols-2 md:shadow-2xl">
+      <div className="containers z-10 mx-4 grid w-full grid-cols-1 sm:mx-6 md:mx-auto md:grid-cols-2">
         {/* Left Side Form */}
         <div className="border-b border-gray-200 p-6 sm:p-8 md:border-b-0 md:border-r md:p-18">
           <Form {...form}>
@@ -93,7 +85,7 @@ export default function ContactForm() {
                       <Input
                         placeholder="Name"
                         {...field}
-                        className="rounded-none border-gray-300 focus:ring-0"
+                        className=" border-gray-300 focus:ring-0 rounded-3xl"
                       />
                     </FormControl>
                   </FormItem>
@@ -109,7 +101,7 @@ export default function ContactForm() {
                         placeholder="Email"
                         type="email"
                         {...field}
-                        className="rounded-none border-gray-300 focus:ring-0"
+                        className="rounded-3xl border-gray-300 focus:ring-0"
                       />
                     </FormControl>
                   </FormItem>
@@ -125,7 +117,7 @@ export default function ContactForm() {
                         placeholder="Phone Number"
                         type="tel"
                         {...field}
-                        className="rounded-none border-gray-300 focus:ring-0"
+                        className="rounded-3xl border-gray-300 focus:ring-0"
                       />
                     </FormControl>
                   </FormItem>
@@ -141,11 +133,11 @@ export default function ContactForm() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="rounded-none border-gray-300 focus:ring-0">
+                        <SelectTrigger className="rounded-3xl border-gray-300 focus:ring-0">
                           <SelectValue placeholder="Country of Residence" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="cursor-pointer border-none bg-white">
+                      <SelectContent className="cursor-pointer rounded-none bg-white">
                         <SelectItem value="uae">
                           United Arab Emirates
                         </SelectItem>
@@ -167,7 +159,7 @@ export default function ContactForm() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="rounded-none border-gray-300 focus:ring-0">
+                        <SelectTrigger className="rounded-3xl border-gray-300 focus:ring-0">
                           <SelectValue placeholder="Your Interest" />
                         </SelectTrigger>
                       </FormControl>
@@ -182,7 +174,7 @@ export default function ContactForm() {
                 )}
               />
 
-              <Button label="SUBMIT" className="w-full" />
+              <Button label="SUBMIT" className="w-full rounded-3xl" />
 
               {/* Terms & Privacy Policy Links */}
               <div className="mt-3 text-center text-[10px] text-gray-600 sm:mt-4">

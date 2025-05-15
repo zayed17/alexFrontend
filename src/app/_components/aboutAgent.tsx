@@ -4,8 +4,8 @@ import React from "react";
 
 export default function AboutAget() {
   return (
-    <div className="w-full bg-white pt-20  px-4 md:px-[5%] max-w-[110rem] mx-auto flex items-center">
-      <div className="container mx-auto">
+    <div className="w-full bg-white pt-20  max-w-[110rem] mx-auto flex items-center">
+      <div className="containers mx-auto">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-30 items-center">
           {/* Left side - Image */}
           <div className="w-full lg:w-1/2 relative">

@@ -38,7 +38,7 @@ export default function DubaiPropertyStats() {
   ]
 
   return (
-    <section className="mx-auto my-12 max-w-[110rem] px-[5%]">
+    <section className="mx-auto my-12 max-w-[110rem] containers">
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Stats Card */}
         <div className="w-full overflow-hidden rounded-[40px] shadow-lg lg:w-1/2">

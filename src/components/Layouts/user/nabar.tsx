@@ -329,9 +329,9 @@ const showWhiteBackground = scrolled || isWhiteBackgroundPage(pathname || "");
             <Image
               src={showWhiteBackground ? mainLogoBlack : mainLogo}
               alt="MR ONE Properties"
-              width={80}
-              height={30}
-              className="h-8 w-auto"
+              width={90}
+              height={50}
+              className="h-12 w-auto"
             />
           </Link>
         </div>
@@ -352,9 +352,9 @@ const showWhiteBackground = scrolled || isWhiteBackgroundPage(pathname || "");
                   </Link>
                   <Link href="/" className="px-4" key="logo">
                     <Image
-                      src={showWhiteBackground ? mainLogoBlack : mainLogo}
+                      src={showWhiteBackground ? mainLogo : mainLogo}
                       alt="MR ONE Properties"
-                      className="w-28 h-auto"
+                      className="w-39 h-auto"
                     />
                   </Link>
                 </React.Fragment>

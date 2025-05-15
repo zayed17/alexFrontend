@@ -3,9 +3,9 @@ import { agentImage, whiteBanner } from "@/constants/images";
 
 export default function RealEstateLanding() {
   return (
-    <main className="min-h-screen w-full">
+    <main className="min-h-screen  w-full">
       {/* Hero Section */}
-      <section className="relative mx-auto w-full overflow-hidden px-[5%] flex flex-col h-auto sm:h-[130vh] md:h-[93vh] lap:h-[86vh]">
+      <section className="relative mx-auto w-full overflow-hidden  flex flex-col h-auto sm:h-[130vh] md:h-[93vh] lap:h-[86vh]">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -15,10 +15,10 @@ export default function RealEstateLanding() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-white/90 via-white/90 to-white/90"></div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-white/90 via-white/90 to-white/10"></div>
         </div>
 
-        <div className="container relative z-20 mx-auto flex flex-col h-full max-w-[110rem] px-4">
+        <div className="containers relative z-20 mx-auto flex flex-col h-full max-w-[110rem] px-4">
           <div className="flex flex-col h-full md:hidden">
             <div className="text-center pt-30 md:pt-10 pb-6">
               <h3 className="mb-1 font-presto text-xl font-semibold italic text-[#877455]">
@@ -62,7 +62,7 @@ export default function RealEstateLanding() {
                 Invest in Dubai Islands Luxury Real Estate
               </h1>
 
-              <h2 className="max-w-md pt-6 font-presto text-xl leading-snug md:text-[27px]">
+              <h2 className="max-w-md pt-6 font-presto text-xl leading-snug md:text-[27px] font-semibold text-[#04080e]">
                 Choose From 20+ Waterfront Projects with 15% ROI Potential
               </h2>
             </div>

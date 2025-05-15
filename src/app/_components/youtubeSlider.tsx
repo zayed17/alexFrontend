@@ -115,7 +115,7 @@ export default function YoutubeVideoSlider() {
   }
 
   return (
-    <section className="mx-auto my-24 max-w-[110rem] px-[5%] ">
+    <section className="mx-auto !my-18 max-w-[110rem] containers ">
       <div className="relative">
         {/* Left scroll button */}
         <button
