@@ -175,7 +175,7 @@ export default function Page() {
           />
         </div>
       </div>
-      <PropertySlider slides={sliderData} />
+      <PropertySlider  />
       <LocationSection
         location={locationData}
         locationDescription={locationDescription}

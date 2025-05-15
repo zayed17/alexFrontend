@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { success1 } from "@/constants/images"
@@ -62,7 +62,7 @@ export default function SuccessfulCases() {
     },
     {
       id: 4,
-      image:success1,
+      image: success1,
       roi: "45%",
       period: "10 months",
       propertyType: "3 bedroom penthouse",
@@ -76,19 +76,32 @@ export default function SuccessfulCases() {
   ]
 
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [visibleCards, setVisibleCards] = useState(3)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const getVisibleCards = (): number => {
-    if (typeof window !== "undefined") {
-      if (window.innerWidth < 768) return 1
-      if (window.innerWidth < 1280) return 2
-      return 3
+  // Update visible cards on window resize
+  useEffect(() => {
+    const updateVisibleCards = () => {
+      if (window.innerWidth < 640) {
+        setVisibleCards(1)
+      } else if (window.innerWidth < 1024) {
+        setVisibleCards(2)
+      } else {
+        setVisibleCards(3)
+      }
     }
-    return 3
-  }
 
-  const visibleCards = getVisibleCards()
-  const maxIndex = cases.length - visibleCards
+    // Set initial value
+    updateVisibleCards()
+
+    // Add event listener
+    window.addEventListener("resize", updateVisibleCards)
+
+    // Clean up
+    return () => window.removeEventListener("resize", updateVisibleCards)
+  }, [])
+
+  const maxIndex = Math.max(0, cases.length - visibleCards)
 
   const handlePrev = () => {
     setCurrentIndex((prev) => Math.max(prev - 1, 0))
@@ -104,26 +117,26 @@ export default function SuccessfulCases() {
   }
 
   return (
-    <section className="my-20 py-20 bg-gray-50 ">
-      <div className="containers mx-auto max-w-[110rem] ">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-serif">Successful Cases</h2>
-          <div className="flex gap-2">
+    <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
+      <div className="px-4 sm:px-6 md:px-8 mx-auto containers max-w-[110rem]">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif mb-4 sm:mb-0">Successful Cases</h2>
+          <div className="flex gap-2 self-end sm:self-auto">
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 sm:p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Previous case"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             <button
               onClick={handleNext}
               disabled={currentIndex >= maxIndex}
-              className="p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 sm:p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Next case"
             >
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
@@ -136,27 +149,27 @@ export default function SuccessfulCases() {
             {cases.map((item) => (
               <div
                 key={item.id}
-                className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-3"
+                className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-2 sm:px-3 mb-4 sm:mb-0"
                 style={{ flex: `0 0 ${100 / visibleCards}%` }}
               >
-                <div className="bg-white rounded-[40px] overflow-hidden shadow-sm h-full">
-                  <div className="relative h-48 md:h-56 w-full">
+                <div className="bg-white rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-sm h-full">
+                  <div className="relative h-40 sm:h-48 md:h-56 w-full">
                     <Image
                       src={item.image || "/placeholder.svg"}
                       alt={`${item.propertyType} in ${item.location}`}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
-                  <div className="px-8 py-10">
-                    <h3 className="text-2xl font-bold mb-4 font-presto">
+                  <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 font-presto">
                       {item.roi} ROI in {item.period}
                     </h3>
-                    <p className="text-gray-700 mb-2">
+                    <p className="text-sm sm:text-base text-gray-700 mb-2">
                       {item.propertyType} in {item.location}, {item.area}
                     </p>
-                    <div className="space-y-1 text-sm">
+                    <div className="space-y-1 text-xs sm:text-sm">
                       <p>Purchase price from developer: {formatCurrency(item.purchasePrice)}</p>
                       <p>Paid by investor: {formatCurrency(item.investorPaid)}</p>
                       <p>
@@ -168,6 +181,18 @@ export default function SuccessfulCases() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Mobile pagination indicator */}
+        <div className="flex justify-center mt-4 sm:hidden">
+          {cases.map((_, index) => (
+            <button
+              key={index}
+              className={`h-2 w-2 mx-1 rounded-full ${index === currentIndex ? "bg-gray-800" : "bg-gray-300"}`}
+              onClick={() => setCurrentIndex(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>

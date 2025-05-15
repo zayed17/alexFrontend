@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import "../globals.css";
 import PageLoader from "@/components/ui-elements/loader/page-loader";
@@ -10,22 +9,22 @@ import WhatsAppWidget from "@/components/user/whatsapp-button";
 
 // Enhanced metadata for better SEO
 export const metadata: Metadata = {
-  title: "Mrone Properties | Luxury Real Estate in Dubai",
+  title: "Inayath Property | Premium Real Estate in Dubai",
   description:
-    "Discover unparalleled luxury real estate opportunities in Dubai with Mrone Properties. Premium villas, apartments, and commercial properties in prime locations.",
+    "Explore premium real estate opportunities in Dubai with Inayath Property. Luxurious villas, apartments, and commercial properties in top locations.",
   keywords:
-    "Dubai real estate, luxury properties, Dubai villas, Dubai apartments, Mrone Properties, property investment",
-  authors: [{ name: "Mrone Properties" }],
+    "Dubai real estate, premium properties, Dubai villas, Dubai apartments, Inayath Property, property investment",
+  authors: [{ name: "Inayath Property" }],
   category: "Real Estate",
   alternates: {
-    canonical: "https://mrone.properties",
+    canonical: "https://inayath.property",
   },
   openGraph: {
-    title: "Mrone Properties | Luxury Real Estate in Dubai",
+    title: "Inayath Property | Premium Real Estate in Dubai",
     description:
-      "Discover unparalleled luxury real estate opportunities in Dubai with Mrone Properties.",
-    url: "https://mrone.properties",
-    siteName: "Mrone Properties",
+      "Explore premium real estate opportunities in Dubai with Inayath Property.",
+    url: "https://inayath.property",
+    siteName: "Inayath Property",
     locale: "en_US",
     type: "website",
     images: [
@@ -33,7 +32,7 @@ export const metadata: Metadata = {
         url: "../../favicon.ico",
         width: 1200,
         height: 630,
-        alt: "MRONE Properties Dubai",
+        alt: "Inayath Property Dubai",
       },
     ],
   },
@@ -48,7 +47,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  
   verification: {
     // Add your verification codes here
     google: " ",
@@ -110,10 +108,10 @@ export default async function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "RealEstateAgent",
-              name: "Mrone Properties",
-              image: "https://mrone.properties/images/logo.png",
-              url: "https://mrone.properties",
-              description: "Luxury real estate agency in Dubai",
+              name: "Inayath Property",
+              image: "https://inayath.property/images/logo.png",
+              url: "https://inayath.property",
+              description: "Premium real estate agency in Dubai",
               address: {
                 "@type": "PostalAddress",
                 addressLocality: "Dubai",
@@ -121,7 +119,7 @@ export default async function RootLayout({
               },
               contactPoint: {
                 "@type": "ContactPoint",
-                telephone: "+971509902467",
+                telephone: "+971509902468",
                 contactType: "Customer Service",
                 availableLanguage: ["English"],
               },

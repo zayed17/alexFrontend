@@ -1,118 +1,127 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Info } from "lucide-react"
+import { banner1 } from "@/constants/images"
 
-export default function propertySlider({slides}:any) {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const slideInterval = useRef<any>(null)
+interface PropertyImage {
+  id: string
+  src: string
+  alt: string
+}
 
-  // Sample images - replace with your actual images
+export default function PropertySlider() {
+  // Sample property images - would come from your CMS or API in production
+  const propertyImages: PropertyImage[] = [
+    {
+      id: "1",
+      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eqoXI9NMz9UvmShR7eLum0LZiwR4j8.png",
+      alt: "Aerial view of luxury residential building with curved pool",
+    },
+    {
+      id: "2",
+      src: "/luxury-apartment-exterior.png",
+      alt: "Luxury apartment exterior view",
+    },
+    {
+      id: "3",
+      src: "/modern-apartment-living-room.png",
+      alt: "Modern apartment interior living room",
+    },
+    {
+      id: "4",
+      src: "/placeholder.svg?key=6xu09",
+      alt: "Luxury apartment bedroom with ocean view",
+    },
+  ]
 
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const sliderRef = useRef<HTMLDivElement>(null)
 
-  const startAutoSlide = () => {
-    slideInterval.current = setInterval(() => {
-      nextSlide()
-    }, 5000)
+  const goToSlide = (index: number) => {
+    if (isTransitioning) return
+
+    setIsTransitioning(true)
+    setCurrentIndex(index)
+
+    // Reset transition state after animation completes
+    setTimeout(() => {
+      setIsTransitioning(false)
+    }, 500)
   }
 
+  const goToPrevious = () => {
+    const newIndex = currentIndex === 0 ? propertyImages.length - 1 : currentIndex - 1
+    goToSlide(newIndex)
+  }
+
+  const goToNext = () => {
+    const newIndex = currentIndex === propertyImages.length - 1 ? 0 : currentIndex + 1
+    goToSlide(newIndex)
+  }
+
+  // Handle keyboard navigation
   useEffect(() => {
-    startAutoSlide()
-    return () => {
-      if (slideInterval.current) clearInterval(slideInterval.current)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        goToPrevious()
+      } else if (e.key === "ArrowRight") {
+        goToNext()
+      }
     }
-  }, [startAutoSlide])
 
-  const resetAutoSlideTimer = () => {
-    if (slideInterval.current) clearInterval(slideInterval.current)
-    startAutoSlide()
-  }
-
-  const nextSlide = () => {
-    if (isAnimating) return
-    setIsAnimating(true)
-    setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
-    setTimeout(() => setIsAnimating(false), 500)
-    resetAutoSlideTimer()
-  }
-
-  const prevSlide = () => {
-    if (isAnimating) return
-    setIsAnimating(true)
-    setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
-    setTimeout(() => setIsAnimating(false), 500)
-    resetAutoSlideTimer()
-  }
-
-  const goToSlide = (index:any) => {
-    if (isAnimating || index === currentSlide) return
-    setIsAnimating(true)
-    setCurrentSlide(index)
-    setTimeout(() => setIsAnimating(false), 500)
-    resetAutoSlideTimer()
-  }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [currentIndex])
 
   return (
-    <div className="containers">
-      <div className="relative rounded-3xl  w-full overflow-hidden aspect-[16/9] sm:aspect-[3/2] md:aspect-[3/1]">
-        {/* Slider */}
-        <div 
-          className="flex transition-transform duration-500 ease-in-out h-full" 
-          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        >
-          {slides.map((slide:any, index:any) => (
-            <div key={index} className="min-w-full relative h-full">
-              <Image 
-                src={slide}
-                alt={slide}
-                fill
-                priority={index === 0}
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
+    <div className="relative mx-auto !my-12 max-w-[110rem] containers overflow-hidden ">
+      {/* Main image slider */}
+      <div className="relative h-[500px] w-full  md:h-[600px]">
+        {propertyImages.map((image, index) => (
+          <div
+            key={image.id}
+            className={`absolute inset-0 h-full w-full transition-opacity  duration-500 ${
+              index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <Image
+              src={banner1 || "/placeholder.svg"}
+              alt={image.alt}
+              fill
+              className="object-cover rounded-3xl"
+              sizes="(max-width: 768px) 100vw, 1100px"
+              priority={index === 0}
+            />
+          </div>
+        ))}
+
 
         {/* Navigation arrows */}
-        <div className="absolute inset-0 flex items-center justify-between p-4">
-          <Button 
-            onClick={prevSlide}
-            variant="ghost" 
-            size="icon"
-            className="bg-white/30 backdrop-blur-sm hover:bg-white/50 rounded-full h-10 w-10"
-            aria-label="Previous slide"
+        <div className="absolute bottom-8 right-[34%] md:right-[47%] flex space-x-4">
+          <button
+            onClick={goToPrevious}
+            disabled={isTransitioning}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform hover:scale-105 active:scale-95"
+            aria-label="Previous image"
           >
-            <ChevronLeft className="h-6 w-6 text-white" />
-          </Button>
-          
-          <Button 
-            onClick={nextSlide}
-            variant="ghost" 
-            size="icon"
-            className="bg-white/30 backdrop-blur-sm hover:bg-white/50 rounded-full h-10 w-10"
-            aria-label="Next slide"
+            <ChevronLeft className="h-7 w-7 text-gray-700" />
+          </button>
+          <button
+            onClick={goToNext}
+            disabled={isTransitioning}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform hover:scale-105 active:scale-95"
+            aria-label="Next image"
           >
-            <ChevronRight className="h-6 w-6 text-white" />
-          </Button>
-        </div>
-
-        {/* Dots indicator */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-          {slides.map((_:any, index:any) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                currentSlide === index ? 'bg-white w-6' : 'bg-white/50'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+            <ChevronRight className="h-7 w-7 text-gray-700" />
+          </button>
         </div>
       </div>
+
     </div>
   )
 }
