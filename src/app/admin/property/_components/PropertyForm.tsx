@@ -16,9 +16,9 @@ import { ShowcaseSection } from "@/components/Layouts/showcase-section"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import FAQInput from "./FAQInput"
-import LocationSelector from "../../community/_components/locationSelect"
 import * as LucideIcons from "lucide-react"
 import FeatureInput from "./features"
+import LocationSelector from "./LocationSelect"
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),

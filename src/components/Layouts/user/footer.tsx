@@ -21,14 +21,6 @@ const ContactFooter: React.FC = () => {
   const [name, setName] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
 
-<<<<<<< HEAD
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle form submission logic here
-    console.log("Form submitted", { name, phoneNumber })
-    // You can add your API call or other logic here
-  }
-=======
   const  handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     const formData = {
@@ -41,7 +33,6 @@ const ContactFooter: React.FC = () => {
     setName("");
     setPhoneNumber("");
   };
->>>>>>> badee301573accb9b7a199cb0e27d3a592452e47
 
   return (
     <footer className="relative overflow-hidden ">
