@@ -11,15 +11,39 @@ import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TextArea from "@/components/FormElements/InputGroup/text-area";
-import { AgentFormData, agentSchema } from "@/validation/validationSchema";
+import { z } from "zod";
+
+// Define schema to match backend model
+const agentSchema = z.object({
+  agentName: z.string().min(1, "Agent name is required"),
+  agentRole: z.string().min(1, "Agent role is required"),
+  successfulCases: z
+    .array(
+      z.object({
+        image: z.any().optional(),
+        title: z.string().min(1, "Case title is required"),
+        features: z
+          .array(z.string())
+          .min(1, "At least one feature is required"),
+      }),
+    )
+    .optional(),
+  sliderImages: z.array(z.any()).optional(),
+  youtubeUrls: z
+    .array(z.string().url("Please enter a valid YouTube URL"))
+    .optional(),
+});
+
+type AgentFormData = z.infer<typeof agentSchema>;
 
 const AgentForm = ({ agent = null }: { agent?: any }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [imagePreview, setImagePreview] = useState<any>(null);
-  const [selectedImageFile, setSelectedImageFile] = useState<any>(null);
+  const [sliderImagePreviews, setSliderImagePreviews] = useState<any[]>([]);
+  const [selectedSliderFiles, setSelectedSliderFiles] = useState<any[]>([]);
   const [imageError, setImageError] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [expertiseInput, setExpertiseInput] = useState("");
+  const [featureInput, setFeatureInput] = useState("");
+  const [youtubeUrlInput, setYoutubeUrlInput] = useState("");
 
   const router = useRouter();
   const isEditMode = !!agent;
@@ -34,15 +58,11 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
   } = useForm<AgentFormData>({
     resolver: zodResolver(agentSchema),
     defaultValues: {
-      name: "",
-      role: "",
-      profileImage: "",
-      email: "",
-      phone: "",
-      roiPercentage: "",
-      yearlyPercentage: "",
-      expertiseAreas: [],
+      agentName: "",
+      agentRole: "",
       successfulCases: [],
+      sliderImages: [],
+      youtubeUrls: [],
     },
   });
 
@@ -51,26 +71,24 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
 
     if (isEditMode && agent) {
       reset({
-        name: agent.name || "",
-        role: agent.role || "",
-        profileImage: agent.profileImage || "",
-        email: agent.email || "",
-        phone: agent.phone || "",
-        roiPercentage: agent.roiPercentage || "",
-        yearlyPercentage: agent.yearlyPercentage || "",
-        expertiseAreas: agent.expertiseAreas || [],
-        successfulCases: agent.successfulCases.map((caseItem: any) => ({
-          title: caseItem.title,
-          description: caseItem.description,
-          caseImages: caseItem.caseImages,
-        })),
+        agentName: agent.agentName || "",
+        agentRole: agent.agentRole || "",
+        successfulCases:
+          agent.successfulCases?.map((caseItem: any) => ({
+            image: caseItem.image || "",
+            title: caseItem.title || "",
+            features: caseItem.features || [],
+          })) || [],
+        sliderImages: agent.sliderImages || [],
+        youtubeUrls: agent.youtubeUrls || [],
       });
 
-      if (agent.profileImage) {
-        setImagePreview(agent.profileImage);
+      if (agent.sliderImages && agent.sliderImages.length > 0) {
+        setSliderImagePreviews(agent.sliderImages);
       }
     }
   }, [isEditMode, agent, reset]);
+
   const onSubmit = async (data: AgentFormData) => {
     setIsSubmitting(true);
     setImageError(null);
@@ -79,41 +97,60 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
       const formData = new FormData();
 
       // Basic fields
-      formData.append("name", data.name);
-      formData.append("role", data.role);
-      formData.append("email", data.email);
-      formData.append("phone", data.phone);
-      formData.append("roiPercentage", data.roiPercentage as any);
-      formData.append("yearlyPercentage", data.yearlyPercentage as any);
-      formData.append("expertiseAreas", JSON.stringify(data.expertiseAreas));
+      formData.append("agentName", data.agentName);
+      formData.append("agentRole", data.agentRole);
 
-      // Profile image logic
-      if (selectedImageFile) {
-        formData.append("profileImage", selectedImageFile);
-      } else if (isEditMode && imagePreview) {
-        formData.append("existingProfileImage", imagePreview);
+      // Slider images
+      selectedSliderFiles.forEach((file) => {
+        formData.append("sliderImages", file); // Multiple files with same field name
+      });
+
+      // YouTube URLs
+      if (data.youtubeUrls && data.youtubeUrls.length > 0) {
+        formData.append("youtubeUrls", JSON.stringify(data.youtubeUrls));
       }
 
-      // Track case images with proper indexing
+      // Handle existing slider images in edit mode
+      if (isEditMode && agent?.sliderImages?.length) {
+        agent.sliderImages.forEach((image: string) => {
+          if (
+            typeof image === "string" &&
+            !selectedSliderFiles.some((f) =>
+              typeof f === "string" ? f === image : f.name === image,
+            )
+          ) {
+            formData.append("existingSliderImages", image);
+          }
+        });
+      }
+
+      // Successful cases with proper indexing
       const successfulCasesMetadata = data.successfulCases?.map(
         (caseItem: any, index: number) => {
-          // If it's a new File, append to formData with consistent field name
-          if (caseItem.caseImages instanceof File) {
-            formData.append("caseImages", caseItem.caseImages); // Use same field name for all
+          // If it's a new File, append to formData with correct field name
+          if (caseItem.image instanceof File) {
+            formData.append(`caseImages_${index}`, caseItem.image); // Use indexed field name
             return {
               title: caseItem.title,
-              description: caseItem.description,
-              caseImages: "", // Will be replaced by backend
+              features: caseItem.features,
+              image: "", // Will be replaced by backend
               isNewImage: true,
-              originalIndex: index, // Track original position
+            };
+          } else if (caseItem.image) {
+            // Existing image in edit mode
+            return {
+              title: caseItem.title,
+              features: caseItem.features,
+              image: caseItem.image,
+              isNewImage: false,
             };
           } else {
+            // Case with no image
             return {
               title: caseItem.title,
-              description: caseItem.description,
-              caseImages: caseItem.caseImages || "",
+              features: caseItem.features,
+              image: "",
               isNewImage: false,
-              originalIndex: index,
             };
           }
         },
@@ -129,12 +166,13 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
           "Content-Type": "multipart/form-data",
         },
       };
+
       if (isEditMode) {
         await axiosInstance.put(`/agent/${agent._id}`, formData, config);
-        toast.success("Agent updated successfully!");
+        toast.success("Agent profile updated successfully!");
       } else {
         await axiosInstance.post("/agent", formData, config);
-        toast.success("Agent added successfully!");
+        toast.success("Agent profile added successfully!");
       }
 
       router.push("/admin/agent");
@@ -142,70 +180,92 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(
-        isEditMode ? "Failed to update agent." : "Failed to add agent.",
+        isEditMode
+          ? "Failed to update agent profile."
+          : "Failed to add agent profile.",
       );
     } finally {
       setIsSubmitting(false);
     }
   };
+  const handleSliderImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files);
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 15 * 1024 * 1024) {
-        setImageError("Image size should be less than 15MB");
-        return;
+      // Validate files
+      for (const file of newFiles) {
+        if (file.size > 15 * 1024 * 1024) {
+          setImageError("Image size should be less than 15MB");
+          return;
+        }
+        const validTypes = [
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
+        if (!validTypes.includes(file.type)) {
+          setImageError("Please upload valid images (JPEG, PNG, GIF, WEBP)");
+          return;
+        }
       }
-      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-      if (!validTypes.includes(file.type)) {
-        setImageError("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
-        return;
-      }
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-      setSelectedImageFile(file);
-      setValue("profileImage", file);
+
+      setSliderImagePreviews([...sliderImagePreviews, ...newPreviews]);
+      setSelectedSliderFiles([...selectedSliderFiles, ...newFiles]);
+      setValue("sliderImages", [
+        ...(watch("sliderImages") as any[]),
+        ...newFiles,
+      ]);
       setImageError(null);
     }
   };
 
-  const removeImage = () => {
-    setImagePreview(null);
-    setSelectedImageFile(null);
-    setValue("profileImage", "");
-    setImageError(null);
+  const removeSliderImage = (index: number) => {
+    const updatedPreviews = [...sliderImagePreviews];
+    updatedPreviews.splice(index, 1);
+
+    const updatedFiles = [...selectedSliderFiles];
+    updatedFiles.splice(index, 1);
+
+    const updatedImages = [...(watch("sliderImages") as any[])];
+    updatedImages.splice(index, 1);
+
+    setSliderImagePreviews(updatedPreviews);
+    setSelectedSliderFiles(updatedFiles);
+    setValue("sliderImages", updatedImages);
   };
 
-  const addExpertiseArea = () => {
-    if (
-      expertiseInput.trim() &&
-      !watch("expertiseAreas")?.includes(expertiseInput.trim())
-    ) {
-      setValue("expertiseAreas", [
-        ...(watch("expertiseAreas") as any[]),
-        expertiseInput.trim(),
+  const addYoutubeUrl = () => {
+    if (youtubeUrlInput.trim()) {
+      setValue("youtubeUrls", [
+        ...(watch("youtubeUrls") as any[]),
+        youtubeUrlInput.trim(),
       ]);
-      setExpertiseInput("");
+      setYoutubeUrlInput("");
     }
   };
 
-  const removeExpertiseArea = (index: number) => {
-    const updatedAreas = [...(watch("expertiseAreas") as any[])];
-    updatedAreas.splice(index, 1);
-    setValue("expertiseAreas", updatedAreas);
+  const removeYoutubeUrl = (index: number) => {
+    const updatedUrls = [...(watch("youtubeUrls") as any[])];
+    updatedUrls.splice(index, 1);
+    setValue("youtubeUrls", updatedUrls);
   };
 
   const addSuccessfulCase = () => {
     setValue("successfulCases", [
       ...(watch("successfulCases") as any[]),
-      { title: "", description: "", caseImages: "" },
+      { title: "", image: "", features: [] },
     ]);
   };
 
   const updateSuccessfulCase = (
     index: number,
     field: string,
-    value: string,
+    value: string | string[],
   ) => {
     const updatedCases = [...(watch("successfulCases") as any[])];
     updatedCases[index] = { ...updatedCases[index], [field]: value };
@@ -237,7 +297,7 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
       const updatedCases = [...(watch("successfulCases") as any[])];
       updatedCases[caseIndex] = {
         ...updatedCases[caseIndex],
-        caseImages: file,
+        image: file,
       };
       setValue("successfulCases", updatedCases);
     }
@@ -247,8 +307,26 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
     const updatedCases = [...(watch("successfulCases") as any[])];
     updatedCases[caseIndex] = {
       ...updatedCases[caseIndex],
-      caseImages: "",
+      image: "",
     };
+    setValue("successfulCases", updatedCases);
+  };
+
+  const addFeature = (caseIndex: number) => {
+    if (featureInput.trim()) {
+      const updatedCases = [...(watch("successfulCases") as any[])];
+      if (!updatedCases[caseIndex].features) {
+        updatedCases[caseIndex].features = [];
+      }
+      updatedCases[caseIndex].features.push(featureInput.trim());
+      setValue("successfulCases", updatedCases);
+      setFeatureInput("");
+    }
+  };
+
+  const removeFeature = (caseIndex: number, featureIndex: number) => {
+    const updatedCases = [...(watch("successfulCases") as any[])];
+    updatedCases[caseIndex].features.splice(featureIndex, 1);
     setValue("successfulCases", updatedCases);
   };
 
@@ -266,166 +344,108 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <InputGroup
-              label="Name"
+              label="Agent Name"
               placeholder="Enter agent name"
               type="text"
-              name="name"
-              value={watch("name")}
+              name="agentName"
+              value={watch("agentName")}
               register={register}
-              error={errors.name?.message}
+              error={errors.agentName?.message}
             />
             <InputGroup
-              label="Role"
+              label="Agent Role"
               placeholder="Enter agent role"
               type="text"
-              name="role"
-              value={watch("role")}
+              name="agentRole"
+              value={watch("agentRole")}
               register={register}
-              error={errors.role?.message}
-            />
-            <InputGroup
-              label="Email"
-              placeholder="Enter agent email"
-              type="email"
-              name="email"
-              value={watch("email")}
-              register={register}
-              error={errors.email?.message}
-            />
-            <InputGroup
-              label="Phone"
-              placeholder="Enter agent phone number"
-              type="tel"
-              name="phone"
-              value={watch("phone")}
-              register={register}
-              error={errors.phone?.message}
+              error={errors.agentRole?.message}
             />
           </div>
+        </ShowcaseSection>
 
+        {/* Slider Images Section */}
+        <ShowcaseSection>
+          <h2 className="mb-4 text-xl font-semibold text-white">
+            Slider Images
+          </h2>
           <div className="mt-6 space-y-2">
             <label className="text-body-sm font-medium text-dark dark:text-white">
-              Upload Agent Image{isEditMode ? "" : " *"}
-              {!isEditMode && (
-                <span className="ml-1 select-none text-red">*</span>
-              )}
+              Upload Slider Images
             </label>
             <input
               type="file"
               accept="image/*"
-              onChange={handleImageChange}
+              multiple
+              onChange={handleSliderImageChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             />
             {imageError && (
               <p className="mt-1 text-xs text-red-500">{imageError}</p>
             )}
-            {(imagePreview || watch("profileImage")) && (
-              <div className="relative mt-4 inline-block h-40 w-40">
-                <Image
-                  src={
-                    imagePreview ||
-                    (typeof watch("profileImage") === "string"
-                      ? watch("profileImage")
-                      : "")
-                  }
-                  fill
-                  alt="Agent Preview"
-                  className="rounded-md object-cover shadow-md"
-                />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute right-0 top-0 -mr-2 -mt-2 rounded-full bg-white p-1 shadow-md hover:bg-gray-200"
-                >
-                  <XCircle className="h-6 w-6 text-gray-800" />
-                </button>
-              </div>
-            )}
-            {errors.profileImage && (
-              <p className="mt-1 text-xs text-red-500">
-                {typeof errors.profileImage === "string"
-                  ? errors.profileImage
-                  : errors.profileImage.message}
-              </p>
-            )}
+            <div className="mt-4 flex flex-wrap gap-4">
+              {sliderImagePreviews.map((preview, index) => (
+                <div key={index} className="relative h-40 w-40">
+                  <Image
+                    src={preview}
+                    fill
+                    alt={`Slider Image ${index + 1}`}
+                    className="rounded-md object-cover shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSliderImage(index)}
+                    className="absolute right-0 top-0 -mr-2 -mt-2 rounded-full bg-white p-1 shadow-md hover:bg-gray-200"
+                  >
+                    <XCircle className="h-6 w-6 text-gray-800" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full mt-8 py-6 text-lg text-white"
-        >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {isEditMode ? "Updating..." : "Submitting..."}
-              </>
-            ) : isEditMode ? (
-              "Update basic information"
-            ) : (
-              "Submit basic information"
-            )}
-          </Button>
         </ShowcaseSection>
 
-        {/* Expertise Areas Section */}
+        {/* YouTube URLs Section */}
         <ShowcaseSection>
           <h2 className="mb-4 text-xl font-semibold text-white">
-            Expertise Areas
+            YouTube URLs
           </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <InputGroup
-              label="ROI Percentage"
-              placeholder="Enter ROI percentage"
-              type="text"
-              name="roiPercentage"
-              value={watch("roiPercentage")}
-              register={register}
-              error={errors.roiPercentage?.message}
-            />
-            <InputGroup
-              label="Yearly Percentage"
-              placeholder="Enter yearly percentage"
-              type="text"
-              name="yearlyPercentage"
-              value={watch("yearlyPercentage")}
-              register={register}
-              error={errors.yearlyPercentage?.message}
-            />
-
-            <label htmlFor="" className="col-span-full">
-              Add Expertise
-            </label>
-            <div className="col-span-full">
+          <div className="space-y-4">
+            <div className="flex gap-2">
               <input
                 type="text"
-                value={expertiseInput}
-                onChange={(e) => setExpertiseInput(e.target.value)}
-                placeholder="Add expertise area"
-                className="w-[91%] flex-1 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                value={youtubeUrlInput}
+                onChange={(e) => setYoutubeUrlInput(e.target.value)}
+                placeholder="Enter YouTube URL"
+                className="flex-1 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               />
               <Button
                 type="button"
-                onClick={addExpertiseArea}
-                className="ml-5 bg-blue-600 hover:bg-blue-700"
+                onClick={addYoutubeUrl}
+                className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            {errors.expertiseAreas && (
-              <p className="text-xs text-red-500">
-                {errors.expertiseAreas.message}
+            {errors.youtubeUrls && (
+              <p className="text-sm text-red-500">
+                {/* If it's a Zod array error, check _errors array */}
+                {(errors.youtubeUrls as any)?._errors?.[0] ??
+                  (Array.isArray(errors.youtubeUrls) &&
+                    errors.youtubeUrls[0]?.message)}
               </p>
             )}
-            <div className="flex flex-wrap gap-2">
-              {watch("expertiseAreas")?.map((area, index) => (
+
+            <div className="space-y-2">
+              {watch("youtubeUrls")?.map((url, index) => (
                 <div
                   key={index}
-                  className="flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm dark:bg-gray-700"
+                  className="flex items-center justify-between rounded-md border border-gray-300 p-2 dark:border-gray-600"
                 >
-                  {area}
+                  <span className="truncate">{url}</span>
                   <button
                     type="button"
-                    onClick={() => removeExpertiseArea(index)}
+                    onClick={() => removeYoutubeUrl(index)}
                     className="ml-2 text-red-500 hover:text-red-700"
                   >
                     <XCircle className="h-4 w-4" />
@@ -479,13 +499,13 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
                       onChange={(e) => handleCaseImageChange(e, index)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
-                    {caseItem.caseImages && (
+                    {caseItem.image && (
                       <div className="relative mt-4 h-40 w-40">
                         <Image
                           src={
-                            typeof caseItem.caseImages === "string"
-                              ? caseItem.caseImages
-                              : URL.createObjectURL(caseItem.caseImages)
+                            typeof caseItem.image === "string"
+                              ? caseItem.image
+                              : URL.createObjectURL(caseItem.image)
                           }
                           fill
                           alt={`Case ${index + 1} Preview`}
@@ -500,32 +520,50 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
                         </button>
                       </div>
                     )}
-                    {errors.successfulCases?.[index]?.caseImages?.message && (
-                      <p className="text-xs text-red-500">
-                        {errors.successfulCases[index]?.caseImages?.message}
-                      </p>
-                    )}
                   </div>
                 </div>
-                <TextArea
-                  label="Description"
-                  placeholder="Enter case description"
-                  type="text"
-                  name={`successfulCases.${index}.description`}
-                  value={caseItem.description}
-                  handleChange={(e: any) =>
-                    updateSuccessfulCase(index, "description", e.target.value)
-                  }
-                  register={register}
-                  error={errors.successfulCases?.[index]?.description?.message}
-                />
+
+                {/* Features Section */}
+                <div className="mt-4">
+                  <label className="text-body-sm font-medium text-dark dark:text-white">
+                    Features
+                  </label>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      type="text"
+                      value={featureInput}
+                      onChange={(e) => setFeatureInput(e.target.value)}
+                      placeholder="Add feature"
+                      className="flex-1 rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => addFeature(index)}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {caseItem.features?.map((feature, featureIndex) => (
+                      <div
+                        key={featureIndex}
+                        className="flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm dark:bg-gray-700"
+                      >
+                        {feature}
+                        <button
+                          type="button"
+                          onClick={() => removeFeature(index, featureIndex)}
+                          className="ml-2 text-red-500 hover:text-red-700"
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
-            {errors.successfulCases && (
-              <p className="text-xs text-red-500">
-                {errors.successfulCases.message}
-              </p>
-            )}
             <Button
               type="button"
               onClick={addSuccessfulCase}
@@ -543,7 +581,7 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push("/admin/agent")}
+            onClick={() => router.push("/admin/agent-profile")}
             className="w-1/2 py-6 text-lg"
           >
             Cancel

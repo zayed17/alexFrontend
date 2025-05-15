@@ -15,16 +15,16 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 
 export const revalidate = 1;
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-  country: z.string().min(1, "Please select your country"),
-  interest: z.string().min(1, "Please select your interest"),
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
+  email: z.string().email("Invalid email address").optional(),
+  phone: z.string().min(10, "Phone number must be at least 10 digits").optional(),
+  country: z.string().min(1, "Please select your country").optional(),
+  interest: z.string().min(1, "Please select your interest").optional(),
 });
 
 export default function ContactForm() {
@@ -39,21 +39,19 @@ export default function ContactForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    if (form.formState.isValid) {
-      axiosInstance
-        .post("/contact", values)
-        .then((response) => {
-          console.log("Data submitted successfully:", response.data);
-          toast.success("Your message has been sent successfully!");
-          form.reset();
-        })
-        .catch((error) => {
-          console.error("There was an error submitting the form:", error);
-          toast.error("Failed to send message. Please try again.");
-        });
-    } else {
-      toast.error("Please fill out the form correctly.");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(values).filter(([_, value]) => value !== "")
+      );
+
+      await axiosInstance.post("/contact", payload);
+      
+      toast.success("Your message has been sent successfully!");
+      form.reset();
+    } catch (error) {
+      console.error("There was an error submitting the form:", error);
+      toast.error("Failed to send message. Please try again.");
     }
   }
 

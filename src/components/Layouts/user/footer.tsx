@@ -14,14 +14,24 @@ import {
   Youtube,
 } from "lucide-react";
 import { agentImage, whiteBanner } from "@/constants/images";
+import { axiosInstance } from "@/lib/axios";
+import toast from "react-hot-toast";
 
 export default function ContactFooter() {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const  handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { name, phoneNumber });
+    const formData = {
+      name,
+      phone:phoneNumber,
+    };
+     await axiosInstance.post("/contact", formData);
+    toast.success("Your message has been sent successfully!");
+
+    setName("");
+    setPhoneNumber("");
   };
 
   return (
@@ -86,7 +96,7 @@ export default function ContactFooter() {
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 text-black py-3 text-sm outline-none"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -95,7 +105,7 @@ export default function ContactFooter() {
               <input
                 type="tel"
                 placeholder="+971   Phone number"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 py-3 text-black text-sm outline-none"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required

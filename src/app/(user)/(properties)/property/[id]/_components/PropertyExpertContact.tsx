@@ -31,7 +31,7 @@ const PropertyInfoRequest = ({
   const handleSubmit = (e: any) => {
     e.preventDefault();
     axiosInstance
-      .post("/client-request", {...formData,agentId, propertyId: id})
+      .post("/contact", {...formData, propertyId: id})
       .then((response) => {
         console.log("Data submitted successfully:", response.data);
         toast.success("Your request has been sent successfully!");
