@@ -54,7 +54,7 @@ const ContactExpert: React.FC<ContactExpertProps> = ({
 
     if (Object.keys(newErrors).length === 0) {
       axiosInstance
-        .post("/client-request", {...formData,agentId:id})
+        .post("/contact", {...formData})
         .then((response) => {
           console.log("Data submitted successfully:", response.data);
           toast.success("Your request has been sent successfully!");

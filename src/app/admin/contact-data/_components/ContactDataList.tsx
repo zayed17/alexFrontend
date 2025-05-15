@@ -77,6 +77,7 @@ export default function ContactList({ data }: any) {
             <TableHead className="min-w-[155px]">Email</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Country</TableHead>
+            <TableHead>IP Address</TableHead>
             <TableHead>Interest</TableHead>
             <TableHead className="text-right xl:pr-7.5">Actions</TableHead>
           </TableRow>
@@ -101,19 +102,23 @@ export default function ContactList({ data }: any) {
                 </TableCell>
 
                 <TableCell className="min-w-[155px]">
-                  <p className="text-dark dark:text-white">{item.email}</p>
+                  <p className="text-dark dark:text-white">{item.email || "N/A"}</p>
                 </TableCell>
 
                 <TableCell>
-                  <p className="text-dark dark:text-white">{item.phone}</p>
+                  <p className="text-dark dark:text-white">{item.phone || "N/A"}</p>
                 </TableCell>
 
                 <TableCell>
-                  <p className="text-dark dark:text-white">{item.country}</p>
+                  <p className="text-dark dark:text-white">{item.country || "N/A"}</p>
                 </TableCell>
 
                 <TableCell>
-                  <p className="text-dark dark:text-white">{item.interest}</p>
+                  <p className="text-dark dark:text-white">{item.ipAddress || "N/A"}</p>
+                </TableCell>
+
+                <TableCell>
+                  <p className="text-dark dark:text-white">{item.interest || "N/A"}</p>
                 </TableCell>
 
                 <TableCell className="xl:pr-7.5">
