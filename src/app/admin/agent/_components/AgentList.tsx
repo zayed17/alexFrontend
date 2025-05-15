@@ -76,9 +76,7 @@ export default function AgentList({ data }: { data: any[] }) {
         <Table>
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
-              <TableHead className="min-w-[120px] xl:pl-7.5">Profile</TableHead>
               <TableHead className="min-w-[180px]">Name</TableHead>
-              <TableHead className="min-w-[200px]">Email</TableHead>
               <TableHead className="min-w-[150px]">Phone</TableHead>
               <TableHead className="text-right xl:pr-7.5">Actions</TableHead>
             </TableRow>
@@ -98,22 +96,12 @@ export default function AgentList({ data }: { data: any[] }) {
                   className="border-[#eee] dark:border-dark-3"
                 >
                   {/* Profile Image */}
-                  <TableCell className="min-w-[120px] xl:pl-7.5">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={agent.profileImage || "/images/placeholder.jpg"}
-                        className="aspect-square h-[50px] w-[50px] rounded-full object-cover"
-                        width={50}
-                        height={50}
-                        alt={`Profile of ${agent.name}`}
-                      />
-                    </div>
-                  </TableCell>
+
 
                   {/* Name */}
                   <TableCell className="min-w-[180px]">
                     <p className="text-sm font-medium text-dark dark:text-white">
-                      {agent.name}
+                      {agent.agentName}
                     </p>
                   </TableCell>
 

@@ -14,17 +14,34 @@ import {
   Youtube,
 } from "lucide-react";
 import { agentImage, whiteBanner } from "@/constants/images";
+import { axiosInstance } from "@/lib/axios";
+import toast from "react-hot-toast";
 
 const ContactFooter: React.FC = () => {
   const [name, setName] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
 
+<<<<<<< HEAD
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Handle form submission logic here
     console.log("Form submitted", { name, phoneNumber })
     // You can add your API call or other logic here
   }
+=======
+  const  handleSubmit = async(e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = {
+      name,
+      phone:phoneNumber,
+    };
+     await axiosInstance.post("/contact", formData);
+    toast.success("Your message has been sent successfully!");
+
+    setName("");
+    setPhoneNumber("");
+  };
+>>>>>>> badee301573accb9b7a199cb0e27d3a592452e47
 
   return (
     <footer className="relative overflow-hidden ">
@@ -88,7 +105,7 @@ const ContactFooter: React.FC = () => {
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 text-black py-3 text-sm outline-none"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -97,7 +114,7 @@ const ContactFooter: React.FC = () => {
               <input
                 type="tel"
                 placeholder="+971   Phone number"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 py-3 text-black text-sm outline-none"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
