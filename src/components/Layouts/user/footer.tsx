@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import type React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+import type React from "react"
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
 import {
   Mail,
   Phone,
@@ -14,22 +14,32 @@ import {
   Youtube,
 } from "lucide-react";
 import { agentImage, whiteBanner } from "@/constants/images";
+import { axiosInstance } from "@/lib/axios";
+import toast from "react-hot-toast";
 
-export default function ContactFooter() {
-  const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+const ContactFooter: React.FC = () => {
+  const [name, setName] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const  handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { name, phoneNumber });
+    const formData = {
+      name,
+      phone:phoneNumber,
+    };
+     await axiosInstance.post("/contact", formData);
+    toast.success("Your message has been sent successfully!");
+
+    setName("");
+    setPhoneNumber("");
   };
 
   return (
-    <footer className="relative overflow-hidden">
+    <footer className="relative overflow-hidden ">
       {/* Background Image */}
       <div className="absolute inset-0 -z-10">
         <Image
-          src={whiteBanner}
+          src={whiteBanner || "/placeholder.svg"}
           alt="Dubai Skyline"
           fill
           className="object-cover"
@@ -41,9 +51,9 @@ export default function ContactFooter() {
       {/* Main Content */}
       <div className="relative z-10 mx-auto min-h-[36rem] max-w-[110rem] px-4">
         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
-          <div className="flex justify-center lg:justify-start">
+          <div className="hidden lg:flex lg:justify-start">
             <Image
-              src={agentImage}
+              src={agentImage || "/placeholder.svg"}
               alt="Real Estate Agent"
               width={798}
               height={750}
@@ -52,14 +62,14 @@ export default function ContactFooter() {
           </div>
 
           {/* Contact Form */}
-          <div className="text-white md:py-0 py-10" >
-            <h2 className="mb-8 font-presto text-3xl leading-snug text-white">
+          <div className="mx-auto w-full max-w-md text-white py-10 lg:max-w-none lg:py-0 lg:mx-0">
+            <h2 className="mb-8 font-presto text-2xl md:text-3xl leading-snug text-white text-center lg:text-left">
               I will help you to buy the <br />
               <span className="font-semibold">Best Property in Dubai</span>
             </h2>
 
             {/* Contact Info */}
-            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-8 sm:space-y-0">
+            <div className="mb-6 flex flex-col space-y-4 sm:flex-row sm:space-x-8 sm:space-y-0 justify-center lg:justify-start">
               <div className="flex items-center space-x-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white">
                   <Mail className="h-5 w-5 text-black" />
@@ -82,11 +92,11 @@ export default function ContactFooter() {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="max-w-[486px] space-y-4">
+            <form onSubmit={handleSubmit} className="mx-auto lg:mx-0 max-w-[486px] space-y-4">
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 text-black py-3 text-sm outline-none"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -95,16 +105,16 @@ export default function ContactFooter() {
               <input
                 type="tel"
                 placeholder="+971   Phone number"
-                className="w-full rounded-full bg-white px-6 py-3 text-sm outline-none"
+                className="w-full rounded-full bg-white px-6 py-3 text-black text-sm outline-none"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
               />
 
-              <div className="flex flex-col space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+              <div className="flex flex-col space-y-3">
                 <button
                   type="submit"
-                  className="rounded-full bg-gray-400 px-8 py-3 text-sm font-medium text-white transition hover:bg-gray-500"
+                  className="w-full rounded-full bg-gray-400 px-8 py-3 text-sm font-medium text-white transition hover:bg-gray-500"
                 >
                   REQUEST INFORMATION
                 </button>
@@ -113,7 +123,7 @@ export default function ContactFooter() {
                   href="https://wa.me/971507239887"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-full bg-green-500 px-16 py-3 text-sm font-medium text-white transition hover:bg-green-600"
+                  className="flex w-full items-center justify-center rounded-full bg-green-500 px-16 py-3 text-sm font-medium text-white transition hover:bg-green-600"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -132,11 +142,11 @@ export default function ContactFooter() {
       </div>
 
       {/* Bottom White Bar */}
-      <div className="bg-white  py-6 shadow-inner ">
-        <div className="mx-auto flex max-w-[110rem] containers flex-col items-center justify-between gap-4 text-sm text-gray-600 sm:flex-row">
-          <div>Copyright © Alexeypavlenko 2025. All Right Reserved.</div>
+      <div className="bg-white py-6 shadow-inner">
+        <div className="mx-auto flex max-w-[110rem] flex-col items-center justify-between gap-4 px-4 text-sm text-gray-600 sm:flex-row">
+          <div className="text-center sm:text-left">Copyright © Alexeypavlenko 2025. All Right Reserved.</div>
 
-          <div className="flex items-center justify-self-start">
+          <div className="flex items-center">
             <div className="flex space-x-4">
               <Link href="#" aria-label="Facebook">
                 <Facebook className="h-5 w-5 transition hover:text-black" />
@@ -167,5 +177,7 @@ export default function ContactFooter() {
         </div>
       </div>
     </footer>
-  );
+  )
 }
+
+export default ContactFooter

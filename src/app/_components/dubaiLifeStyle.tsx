@@ -40,7 +40,7 @@ export default function DubaiLifestyle() {
   return (
     <section className="bg-[#F5F6F7]" aria-labelledby="lifestyle-heading">
       <div className="mx-auto max-w-[110rem] containers  py-20">
-        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 py-12">
           {/* Left content area */}
           <div className="space-y-6 lg:col-span-5">
             <h2

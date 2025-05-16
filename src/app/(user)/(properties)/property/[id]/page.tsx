@@ -157,7 +157,7 @@ export default async function Page({ params }: any) {
           />
         </div>
       </div>
-      <PropertySlider slides={sliderData} />
+      <PropertySlider  />
       <LocationSection
         location={locationData}
         locationDescription={locationDescription}

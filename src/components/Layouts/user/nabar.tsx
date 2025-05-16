@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { mainLogo, mainLogoBlack } from "@/constants/images";
 import { usePathname } from "next/navigation";
-import { getCommunityNames, getProperty } from "@/api/api";
+import {  getProperty } from "@/api/api";
 
 // Type definitions
 interface CommunityData {
@@ -45,18 +45,6 @@ const Navbar: React.FC = () => {
   const pathname = usePathname();
 
   // Fetch community data
-  useEffect(() => {
-    const fetchCommunities = async () => {
-      try {
-        const data = await getCommunityNames();
-        setCommunityData(data);
-      } catch (error) {
-        console.error("Error fetching community data:", error);
-      }
-    };
-
-    fetchCommunities();
-  }, []);
 
   // Fetch property data
   useEffect(() => {
