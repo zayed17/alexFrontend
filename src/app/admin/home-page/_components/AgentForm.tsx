@@ -13,7 +13,6 @@ import Image from "next/image";
 import TextArea from "@/components/FormElements/InputGroup/text-area";
 import { z } from "zod";
 
-
 const agentSchema = z.object({
   agentName: z.string().min(1, "Agent name is required"),
   agentRole: z.string().min(1, "Agent role is required"),
@@ -28,14 +27,16 @@ const agentSchema = z.object({
         features: z
           .array(z.string().min(1, "Feature cannot be empty"))
           .min(1, "At least one feature is required"),
-      })
+      }),
     )
     .min(1, "At least one successful case is required"),
   sliderImages: z
-    .array(z.any({
-      required_error: "Slider image is required",
-      invalid_type_error: "Invalid image",
-    }))
+    .array(
+      z.any({
+        required_error: "Slider image is required",
+        invalid_type_error: "Invalid image",
+      }),
+    )
     .min(1, "At least one slider image is required"),
   youtubeUrls: z
     .array(z.string().min(1).url("Please enter a valid YouTube URL"))
@@ -181,7 +182,7 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
         toast.success("Agent profile added successfully!");
       }
 
-      router.push("/admin/agent");
+      router.push("/admin/home-page");
       router.refresh();
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -551,11 +552,11 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
                     </Button>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
-                  {errors.successfulCases?.[index]?.features && (
-  <p className="mt-1 text-sm text-red-600">
-    {errors?.successfulCases[index]?.features?.message}
-  </p>
-)}
+                    {errors.successfulCases?.[index]?.features && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors?.successfulCases[index]?.features?.message}
+                      </p>
+                    )}
                     {caseItem.features?.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}

@@ -6,8 +6,14 @@ export const NAV_DATA = [
     items: [
       {
         title: "Dashboard",
-        icon: Icons.HomeIcon,
+        icon: Icons.DashboardIcon,
         url: "/admin",
+        items: [],
+      },
+      {
+        title: "Home Page",
+        url: "/admin/home-page",
+        icon: Icons.HomeIcon,
         items: [],
       },
       {
@@ -21,12 +27,6 @@ export const NAV_DATA = [
         url: "/admin/property",
         icon: Icons.PropertyIcon,
         items: [],
-      },
-      {
-        title: "Agents",
-        url: "/admin/agent",
-        icon: Icons.AgentIcon,
-        items: [],
       },      
       {
         title: "Contact Data",
@@ -37,7 +37,7 @@ export const NAV_DATA = [
       {
         title: "Client Request",
         url: "/admin/client-request",
-        icon: Icons.PhoneIcon,
+        icon: Icons.ClientRequestIcon,
         items: [],
       }
     ],

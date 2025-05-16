@@ -1,6 +1,7 @@
+import { getAmenities } from "@/api/api";
 import PropertyForm from "../_components/PropertyForm";
 import type { Metadata } from "next";
-import { getAgents, getAmenities, getCommunity, getCommunityNames, getPropertyTypes } from "@/api/api";
+import { notFound } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Add Property",
@@ -8,7 +9,10 @@ export const metadata: Metadata = {
 
 export default async function AddPropertyPage() {
 
-  const amenitiesData = [{iconName:"fsdfds",_id:"fasdfas"}]
+const amenitiesData = await getAmenities();
+if (!amenitiesData) {
+    return notFound();
+  }
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAgents, getAmenities, getCommunityNames, getPropertyById, getPropertyTypes } from "@/api/api";
+import { getAgents, getAmenities, getPropertyById, getPropertyTypes } from "@/api/api";
 import PropertyForm from "../../_components/PropertyForm";
 
 export const metadata: Metadata = {
@@ -12,9 +12,6 @@ export default async function EditCommunityPage({ params }: any) {
 
   const property = await getPropertyById(id);
   const amenitiesData = await getAmenities();
-  const propertyTypes = await getPropertyTypes();
-  const communityData = await getCommunityNames();
-  const agentData = await getAgents()
 
   if (!property) {
     return notFound();
