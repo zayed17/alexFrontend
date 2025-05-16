@@ -4,7 +4,6 @@ import React from "react";
 const AmenitiesGrid = ({ amenitiesData }: any) => {
   // Use provided data or fallback to default amenities
   const amenities = amenitiesData
-
   return (
     <div className="containers ">
 

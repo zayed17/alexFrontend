@@ -140,7 +140,7 @@ export default async function Page({ params }: any) {
     <div className="pt-18">
       <PropertyLanding propertyData={propertyData} />
       <PropertySection2 propertyData={samplePropertyData} />
-      <AmenitiesGrid amenitiesData={sampleAmenities} />
+      <AmenitiesGrid amenitiesData={property?.amenities} />
       <PropertyPayment paymentDetails={paymentDetails} />
 
       <div className="w-full bg-gray-50 py-12 md:py-16">
