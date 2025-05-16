@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import { success1 } from "@/constants/images"
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { success1 } from "@/constants/images";
 
 interface SuccessfulCase {
-  id: number
-  image: any
-  roi: string
-  period: string
-  propertyType: string
-  location: string
-  area: string
-  purchasePrice: number
-  investorPaid: number
-  currentPrice: number
-  percentageGain: number
+  id: number;
+  image: any;
+  roi: string;
+  period: string;
+  propertyType: string;
+  location: string;
+  area: string;
+  purchasePrice: number;
+  investorPaid: number;
+  currentPrice: number;
+  percentageGain: number;
 }
 
-export default function SuccessfulCases() {
+export default function SuccessfulCases({ successfulCases }: any) {
   const cases: SuccessfulCase[] = [
     {
       id: 1,
@@ -73,67 +73,65 @@ export default function SuccessfulCases() {
       currentPrice: 875000,
       percentageGain: 16.7,
     },
-  ]
+  ];
 
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [visibleCards, setVisibleCards] = useState(3)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visibleCards, setVisibleCards] = useState(3);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Update visible cards on window resize
   useEffect(() => {
     const updateVisibleCards = () => {
       if (window.innerWidth < 640) {
-        setVisibleCards(1)
+        setVisibleCards(1);
       } else if (window.innerWidth < 1024) {
-        setVisibleCards(2)
+        setVisibleCards(2);
       } else {
-        setVisibleCards(3)
+        setVisibleCards(3);
       }
-    }
+    };
 
     // Set initial value
-    updateVisibleCards()
+    updateVisibleCards();
 
     // Add event listener
-    window.addEventListener("resize", updateVisibleCards)
+    window.addEventListener("resize", updateVisibleCards);
 
     // Clean up
-    return () => window.removeEventListener("resize", updateVisibleCards)
-  }, [])
+    return () => window.removeEventListener("resize", updateVisibleCards);
+  }, []);
 
-  const maxIndex = Math.max(0, cases.length - visibleCards)
+  const maxIndex = Math.max(0, cases.length - visibleCards);
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0))
-  }
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
+  };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex))
-  }
+    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
+  };
 
-  // Format currency
-  const formatCurrency = (amount: number): string => {
-    return `$${amount.toLocaleString()}`
-  }
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 bg-gray-50">
-      <div className="px-4 sm:px-6 md:px-8 mx-auto containers max-w-[110rem]">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif mb-4 sm:mb-0">Successful Cases</h2>
+    <section className="bg-gray-50 py-12 sm:py-16 md:py-20">
+      <div className="containers mx-auto max-w-[110rem] px-4 sm:px-6 md:px-8">
+        <div className="mb-6 flex flex-col items-start justify-between sm:mb-8 sm:flex-row sm:items-center">
+          <h2 className="mb-4 font-serif text-2xl sm:mb-0 sm:text-3xl md:text-4xl">
+            Successful Cases
+          </h2>
           <div className="flex gap-2 self-end sm:self-auto">
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="p-2 sm:p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full border border-gray-300 bg-white p-2 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:p-3"
               aria-label="Previous case"
             >
               <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             <button
               onClick={handleNext}
-              disabled={currentIndex >= maxIndex}
-              className="p-2 sm:p-3 rounded-full border border-gray-300 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={currentIndex >= maxIndex || successfulCases?.length < 3}
+              className="rounded-full border border-gray-300 bg-white p-2 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:p-3"
               aria-label="Next case"
             >
               <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -144,37 +142,36 @@ export default function SuccessfulCases() {
         <div className="relative overflow-hidden" ref={containerRef}>
           <div
             className="flex transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
+            style={{
+              transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
+            }}
           >
-            {cases.map((item) => (
+            {successfulCases.map((item:any) => (
               <div
-                key={item.id}
-                className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-2 sm:px-3 mb-4 sm:mb-0"
+                key={item._id}
+                className="mb-4 w-full flex-shrink-0 px-2 sm:mb-0 sm:w-1/2 sm:px-3 lg:w-1/3"
                 style={{ flex: `0 0 ${100 / visibleCards}%` }}
               >
-                <div className="bg-white rounded-[20px] sm:rounded-[30px] md:rounded-[40px] overflow-hidden shadow-sm h-full">
-                  <div className="relative h-40 sm:h-48 md:h-56 w-full">
+                <div className="h-full overflow-hidden rounded-[20px] bg-white shadow-sm sm:rounded-[30px] md:rounded-[40px]">
+                  <div className="relative h-40 w-full sm:h-48 md:h-56">
                     <Image
                       src={item.image || "/placeholder.svg"}
-                      alt={`${item.propertyType} in ${item.location}`}
+                      alt={`${item.title}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
-                  <div className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10">
-                    <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 font-presto">
-                      {item.roi} ROI in {item.period}
+                  <div className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
+                    <h3 className="mb-2 font-presto text-xl font-bold sm:mb-4 sm:text-2xl">
+                      {item.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-700 mb-2">
-                      {item.propertyType} in {item.location}, {item.area}
-                    </p>
                     <div className="space-y-1 text-xs sm:text-sm">
-                      <p>Purchase price from developer: {formatCurrency(item.purchasePrice)}</p>
-                      <p>Paid by investor: {formatCurrency(item.investorPaid)}</p>
-                      <p>
-                        Apartment price today: {formatCurrency(item.currentPrice)} (+{item.percentageGain}%)
-                      </p>
+                      {item.features.map((val: any, index: number) => (
+                        <>
+                          <p>{val}</p>
+                        </>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -184,11 +181,11 @@ export default function SuccessfulCases() {
         </div>
 
         {/* Mobile pagination indicator */}
-        <div className="flex justify-center mt-4 sm:hidden">
+        <div className="mt-4 flex justify-center sm:hidden">
           {cases.map((_, index) => (
             <button
               key={index}
-              className={`h-2 w-2 mx-1 rounded-full ${index === currentIndex ? "bg-gray-800" : "bg-gray-300"}`}
+              className={`mx-1 h-2 w-2 rounded-full ${index === currentIndex ? "bg-gray-800" : "bg-gray-300"}`}
               onClick={() => setCurrentIndex(index)}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -196,5 +193,5 @@ export default function SuccessfulCases() {
         </div>
       </div>
     </section>
-  )
+  );
 }

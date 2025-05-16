@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { agentImage, whiteBanner } from "@/constants/images";
 
-export default function RealEstateLanding() {
+export default function RealEstateLanding({agent}:any) {
+  console.log(agent);
+  
   return (
     <main className="min-h-screen  w-full">
       {/* Hero Section */}
@@ -22,9 +24,9 @@ export default function RealEstateLanding() {
           <div className="flex flex-col h-full md:hidden">
             <div className="text-center pt-30 md:pt-10 pb-6">
               <h3 className="mb-1 font-presto text-xl font-semibold italic text-[#877455]">
-                Alexey Andrienko
+                {agent.agentName}
               </h3>
-              <p className="mb-6 mt-2 text-base ">Real Estate Expert in Dubai</p>
+              <p className="mb-6 mt-2 text-base ">{agent.agentRole}</p>
 
               <h1 className="mb-4 font-presto text-2xl sm:text-3xl font-normal !leading-none !tracking-[-0.04rem] text-[#071C35]">
                 Invest in Dubai Islands Luxury Real Estate
@@ -54,9 +56,9 @@ export default function RealEstateLanding() {
             {/* Left Column - Text */}
             <div className="col-span-1 self-center justify-self-start">
               <h3 className="mb-1 font-presto text-xl font-semibold italic text-[#877455] md:text-[40px]">
-                Alexey Andrienko
+                {agent.agentName}
               </h3>
-              <p className="mb-10 mt-3 text-xl">Real Estate Expert in Dubai</p>
+              <p className="mb-10 mt-3 text-xl">{agent.agentRole}</p>
 
               <h1 className="mb-6 !min-w-[37rem] font-presto text-3xl font-normal !leading-none !tracking-[-0.04rem] text-[#071C35] md:text-4xl lg:text-[50px]">
                 Invest in Dubai Islands Luxury Real Estate

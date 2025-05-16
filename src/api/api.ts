@@ -101,7 +101,7 @@ export async function getPropertyById(id:string) {
 
 export async function getHomePageData() {
   try {
-    const response = await axiosInstance.get("/property/home-page");
+    const response = await axiosInstance.get("/agent/home");
     return response.data || [];
   } catch (error) {
     console.error("Error fetching property:", error);
