@@ -40,7 +40,7 @@ export default function PropertyCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="h-[400px]  ">
-        <Link href={href} className="block">
+        <Link href={`/property/${id }`} className="block">
           <div className="relative h-[250px] w-full overflow-hidden rounded-t-3xl">
             <Image
               src={imageUrl || "/placeholder.svg"}
@@ -67,7 +67,7 @@ export default function PropertyCard({
         {showButton && (
           <div className="mx-2 px-4 pb-4">
             <Link
-              href={href}
+              href={`/property/${id }`}
               className="inline-block w-full rounded-full bg-[#0a1a2a] py-2 text-center text-sm font-medium text-white transition-colors hover:bg-[#0c2238]"
             >
               CHECK AVAILABILITY

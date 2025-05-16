@@ -1,5 +1,21 @@
 import { axiosInstance } from "@/lib/axios";
 
+export enum PropertyType {
+  Affordable = "affordable",
+  Luxury = "luxury",
+  Exclusive = "exclusive",
+}
+
+export async function getProperties(type:PropertyType) {
+  try {
+    const response = await axiosInstance.get("/property?type=" + type);
+    
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching property types:", error);
+    return [];
+  }
+}
 export async function getPropertyTypes() {
   try {
     const response = await axiosInstance.get("/property-type");
