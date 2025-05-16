@@ -12,37 +12,17 @@ import {
 import { EditIcon } from "@/components/Tables/icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { axiosInstance } from "@/lib/axios";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { useClientSidePagination } from "@/hooks/useClientSidePagination";
 import { PaginationControls, SearchControls } from "@/app/_components/SearchAndPagination";
-import { Tabs } from "@/components/ui/tabs";
 
-
-const TABS = ["All", "Luxury", "Affordable", "Exclusive"];
-
-export default function PropertyList({ data }: any) {
+export default function AgentList({ data }: { data: any[] }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [activeTab, setActiveTab] = useState("All");
-
-  const filteredData = useMemo(() => {
-    switch (activeTab) {
-      case "Luxury":
-        return data.filter((item: any) => item.isLuxury);
-      case "Affordable":
-        return data.filter((item: any) => item.isAffordable);
-      case "Exclusive":
-        return data.filter((item: any) => item.isExclusive);
-      case "All":
-      default:
-        return data;
-    }
-  }, [activeTab, data]);
-  
 
   const {
     search,
@@ -57,22 +37,22 @@ export default function PropertyList({ data }: any) {
     startItem,
     endItem,
   } = useClientSidePagination({
-    data: filteredData,
-    searchKeys: ["title", "bedrooms", "price", "developer"],
+    data,
+    searchKeys: ["name", "email", "phone"],
   });
 
   const handleDelete = async (id: any) => {
-    if (window.confirm("Are you sure you want to delete this property?")) {
+    if (window.confirm("Are you sure you want to delete this agent?")) {
       setIsDeleting(true);
       setDeletingId(id);
 
       try {
-        await axiosInstance.delete(`/property/${id}`);
-        toast.success("Property deleted successfully!");
+        await axiosInstance.delete(`/agent/${id}`);
+        toast.success("Agent deleted successfully!");
         router.refresh();
       } catch (error) {
-        console.error("Error deleting property:", error);
-        toast.error("Failed to delete property.");
+        console.error("Error deleting agent:", error);
+        toast.error("Failed to delete agent.");
       } finally {
         setIsDeleting(false);
         setDeletingId(null);
@@ -81,28 +61,23 @@ export default function PropertyList({ data }: any) {
   };
 
   const handleEdit = (id: any) => {
-    router.push(`/admin/property/edit-property/${id}`);
+    router.push(`/admin/agent/edit-agent/${id}`);
   };
 
   return (
     <div className="space-y-6">
-
-      <SearchControls
+      <SearchControls 
         search={search}
         setSearch={setSearch}
-        placeholder="Search Properties..."
+        placeholder="Search agents by name, email or phone..."
       />
-
-      <Tabs tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
+      
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-sm dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <Table>
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
-              <TableHead className="min-w-[155px] xl:pl-7.5">Title</TableHead>
-              <TableHead className="min-w-[155px]">Main Image</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Bedrooms</TableHead>
-              <TableHead>Developer</TableHead>
+              <TableHead className="min-w-[180px]">Name</TableHead>
+              <TableHead className="min-w-[150px]">Phone</TableHead>
               <TableHead className="text-right xl:pr-7.5">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -110,62 +85,53 @@ export default function PropertyList({ data }: any) {
           <TableBody>
             {!paginatedData || paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="py-5 text-center text-gray-500">
-                  No properties found.
+                <TableCell colSpan={5} className="py-5 text-center text-gray-500">
+                  No agents found.
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((item: any) => (
+              paginatedData.map((agent: any) => (
                 <TableRow
-                  key={item._id}
+                  key={agent._id}
                   className="border-[#eee] dark:border-dark-3"
                 >
-                  <TableCell>
+                  {/* Profile Image */}
+
+
+                  {/* Name */}
+                  <TableCell className="min-w-[180px]">
                     <p className="text-sm font-medium text-dark dark:text-white">
-                      {item.title}
+                      {agent.agentName}
                     </p>
                   </TableCell>
 
-                  <TableCell className="min-w-[155px] xl:pl-7.5">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={`${item.mainImage}` || "/images/placeholder.jpg"}
-                        className="aspect-[6/5] h-[50px] w-[60px] rounded-[5px] object-cover"
-                        width={60}
-                        height={50}
-                        alt={`Main Image of ${item.title}`}
-                      />
-                    </div>
+                  {/* Email */}
+                  <TableCell className="min-w-[200px]">
+                    <p className="text-dark dark:text-white">{agent.email}</p>
                   </TableCell>
 
-                  <TableCell className="min-w-[155px]">
-                    <p className="text-dark dark:text-white">{item.price}</p>
+                  {/* Phone */}
+                  <TableCell className="min-w-[150px]">
+                    <p className="text-dark dark:text-white">{agent.phone}</p>
                   </TableCell>
 
-                  <TableCell>
-                    <p className="text-dark dark:text-white">{item.bedrooms}</p>
-                  </TableCell>
-
-                  <TableCell>
-                    <p className="text-dark dark:text-white">{item.developer}</p>
-                  </TableCell>
-
+                  {/* Actions */}
                   <TableCell className="xl:pr-7.5">
                     <div className="flex items-center justify-end gap-x-3.5">
                       <button
                         className="hover:text-primary"
                         aria-label="Edit"
-                        onClick={() => handleEdit(item._id)}
+                        onClick={() => handleEdit(agent._id)}
                       >
                         <EditIcon />
                       </button>
                       <button
                         className="hover:text-primary"
                         aria-label="Delete"
-                        onClick={() => handleDelete(item._id)}
-                        disabled={isDeleting && deletingId === item._id}
+                        onClick={() => handleDelete(agent._id)}
+                        disabled={isDeleting && deletingId === agent._id}
                       >
-                        {isDeleting && deletingId === item._id ? (
+                        {isDeleting && deletingId === agent._id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <TrashIcon />
