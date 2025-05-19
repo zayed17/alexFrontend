@@ -13,27 +13,35 @@ import Image from "next/image";
 import TextArea from "@/components/FormElements/InputGroup/text-area";
 import { z } from "zod";
 
-// Define schema to match backend model
 const agentSchema = z.object({
   agentName: z.string().min(1, "Agent name is required"),
   agentRole: z.string().min(1, "Agent role is required"),
   successfulCases: z
     .array(
       z.object({
-        image: z.any().optional(),
+        image: z.any({
+          required_error: "Case image is required",
+          invalid_type_error: "Invalid image",
+        }),
         title: z.string().min(1, "Case title is required"),
         features: z
-          .array(z.string())
+          .array(z.string().min(1, "Feature cannot be empty"))
           .min(1, "At least one feature is required"),
       }),
     )
-    .optional(),
-  sliderImages: z.array(z.any()).optional(),
+    .min(1, "At least one successful case is required"),
+  sliderImages: z
+    .array(
+      z.any({
+        required_error: "Slider image is required",
+        invalid_type_error: "Invalid image",
+      }),
+    )
+    .min(1, "At least one slider image is required"),
   youtubeUrls: z
-    .array(z.string().url("Please enter a valid YouTube URL"))
-    .optional(),
+    .array(z.string().min(1).url("Please enter a valid YouTube URL"))
+    .min(1, "At least one YouTube URL is required"),
 });
-
 type AgentFormData = z.infer<typeof agentSchema>;
 
 const AgentForm = ({ agent = null }: { agent?: any }) => {
@@ -127,7 +135,6 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
       // Successful cases with proper indexing
       const successfulCasesMetadata = data.successfulCases?.map(
         (caseItem: any, index: number) => {
-          // If it's a new File, append to formData with correct field name
           if (caseItem.image instanceof File) {
             formData.append(`caseImages_${index}`, caseItem.image); // Use indexed field name
             return {
@@ -175,7 +182,7 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
         toast.success("Agent profile added successfully!");
       }
 
-      router.push("/admin/agent");
+      router.push("/admin/home-page");
       router.refresh();
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -545,6 +552,11 @@ const AgentForm = ({ agent = null }: { agent?: any }) => {
                     </Button>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
+                    {errors.successfulCases?.[index]?.features && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors?.successfulCases[index]?.features?.message}
+                      </p>
+                    )}
                     {caseItem.features?.map((feature, featureIndex) => (
                       <div
                         key={featureIndex}

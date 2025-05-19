@@ -25,12 +25,9 @@ export default function PropertyLanding({ propertyData }: any) {
 
           <div className="relative z-20 flex h-full flex-col items-center">
             <div className="mx-auto max-w-4xl px-4 pt-16 text-center md:pt-24 lg:pt-32">
-              <h1 className="mb-1 text-3xl font-light text-white sm:text-4xl md:text-5xl">
+              <h1 className="mb-1 text-3xl font-light text-white sm:text-4xl md:text-5xl max-w-lg">
                 {propertyData.title}
               </h1>
-              <h2 className="text-2xl font-light text-white sm:text-3xl md:text-4xl">
-                {propertyData.location}
-              </h2>
             </div>
 
             {/* CTA Buttons */}

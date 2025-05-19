@@ -11,30 +11,8 @@ interface PropertyImage {
   alt: string
 }
 
-export default function PropertyGallerySlider() {
-  // Sample property images - would come from your CMS or API in production
-  const propertyImages: PropertyImage[] = [
-    {
-      id: "1",
-      src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-eqoXI9NMz9UvmShR7eLum0LZiwR4j8.png",
-      alt: "Aerial view of luxury residential building with curved pool",
-    },
-    {
-      id: "2",
-      src: "/luxury-apartment-exterior.png",
-      alt: "Luxury apartment exterior view",
-    },
-    {
-      id: "3",
-      src: "/modern-apartment-living-room.png",
-      alt: "Modern apartment interior living room",
-    },
-    {
-      id: "4",
-      src: "/placeholder.svg?key=6xu09",
-      alt: "Luxury apartment bedroom with ocean view",
-    },
-  ]
+export default function PropertyGallerySlider({sliderImages}:any) {
+
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -53,12 +31,12 @@ export default function PropertyGallerySlider() {
   }
 
   const goToPrevious = () => {
-    const newIndex = currentIndex === 0 ? propertyImages.length - 1 : currentIndex - 1
+    const newIndex = currentIndex === 0 ? sliderImages.length - 1 : currentIndex - 1
     goToSlide(newIndex)
   }
 
   const goToNext = () => {
-    const newIndex = currentIndex === propertyImages.length - 1 ? 0 : currentIndex + 1
+    const newIndex = currentIndex === sliderImages.length - 1 ? 0 : currentIndex + 1
     goToSlide(newIndex)
   }
 
@@ -82,7 +60,7 @@ export default function PropertyGallerySlider() {
     <div className="relative mx-auto my-12 max-w-[110rem] containers overflow-hidden ">
       {/* Main image slider */}
       <div className="relative h-[500px] w-full  md:h-[600px]">
-        {propertyImages.map((image, index) => (
+        {sliderImages.map((image:any, index:number) => (
           <div
             key={image.id}
             className={`absolute inset-0 h-full w-full transition-opacity  duration-500 ${
@@ -90,8 +68,8 @@ export default function PropertyGallerySlider() {
             }`}
           >
             <Image
-              src={banner1 || "/placeholder.svg"}
-              alt={image.alt}
+              src={image || "/placeholder.svg"}
+              alt={"loading..."}
               fill
               className="object-cover rounded-3xl"
               sizes="(max-width: 768px) 100vw, 1100px"

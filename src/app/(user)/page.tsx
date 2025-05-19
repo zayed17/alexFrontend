@@ -10,27 +10,26 @@ import YoutubeVideoSlider from "../_components/youtubeSlider";
 import PropertyGallerySlider from "../_components/homeSlider";
 import ReasonsToInvest from "../_components/9reasons";
 import DubaiLifestyle from "../_components/dubaiLifeStyle";
-import AffordableProperties from "./(properties)/affordableproperties/page";
 import HomeProperties from "../_components/homeProperties";
 
 export default async function Page() {
-  const homePageData = await getHomePageData();
-
+  const {properties,agentProfiles} = await getHomePageData();
+  console.log(agentProfiles,properties);
 
   return (
     <>
       <main>
-        <div >
-          <HeroSection />
+        <div>
+          <HeroSection agent={{agentName:agentProfiles.agentName,agentRole:agentProfiles.agentRole}} />
         </div>
         <AboutAget />
-        <SuccessfulCases />
+        <SuccessfulCases successfulCases={agentProfiles.successfulCases} />
         <DubaiPropertyStats />
-        <YoutubeVideoSlider />
-        <PropertyGallerySlider />
+        <YoutubeVideoSlider youtubeUrls={agentProfiles.youtubeUrls} />
+        <PropertyGallerySlider sliderImages={agentProfiles.sliderImages} />
         <ReasonsToInvest />
         <DubaiLifestyle />
-        <HomeProperties />
+        <HomeProperties property={properties} />
       </main>
     </>
   );

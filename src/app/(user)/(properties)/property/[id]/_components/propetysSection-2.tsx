@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function PropertySection2({ propertyData }: any) {
   return (
     <div className="containers">
-      <div className="!py-20   w-full  ">
+      <div className="w-full !py-20">
         {/* Main Container with Rounded Corners */}
         <div className="flex flex-col overflow-hidden bg-white md:flex-row">
           {/* Image Section */}
@@ -39,22 +39,12 @@ export default function PropertySection2({ propertyData }: any) {
 
             {/* Amenities List */}
             <ul className="mb-8 space-y-2 text-sm text-gray-600 md:text-base">
-              <li className="flex items-center">
-                <span className="mr-3 h-2 w-2 rounded-full bg-gray-600"></span>
-                Internal Kids Play Area
-              </li>
-              <li className="flex items-center">
-                <span className="mr-3 h-2 w-2 rounded-full bg-gray-600"></span>
-                State-of-the-Art Gymnasium
-              </li>
-              <li className="flex items-center">
-                <span className="mr-3 h-2 w-2 rounded-full bg-gray-600"></span>
-                Swimming Pools
-              </li>
-              <li className="flex items-center">
-                <span className="mr-3 h-2 w-2 rounded-full bg-gray-600"></span>
-                Co-working Space
-              </li>
+              {propertyData.features.map((val:any,index:number) => (
+                <li key={index} className="flex items-center">
+                  <span className="mr-3 h-2 w-2 rounded-full bg-gray-600"></span>
+                  {val}
+                </li>
+              ))}
             </ul>
 
             {/* Check Availability Button */}

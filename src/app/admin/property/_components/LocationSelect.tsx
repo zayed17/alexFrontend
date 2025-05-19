@@ -205,8 +205,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       {errors?.location?.country && (
         <div className="mt-2 text-sm text-red-500">{errors.location.country.message as string}</div>
       )}
-      {errors?.location && <div className="mt-2 text-sm text-red-500">{"please select a location"}</div>}
-
       {/* Loading Indicator */}
       {isLoading && (
         <div className="absolute z-10 w-full rounded bg-gray-800">

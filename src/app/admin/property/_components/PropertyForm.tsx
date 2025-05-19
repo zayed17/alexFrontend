@@ -1,31 +1,33 @@
-"use client"
-import { useState, useEffect } from "react"
-import type React from "react"
+"use client";
+import { useState, useEffect } from "react";
+import type React from "react";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import InputGroup from "@/components/FormElements/InputGroup"
-import TextArea from "@/components/FormElements/InputGroup/text-area"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { XCircle, Loader2, Plus } from "lucide-react"
-import { axiosInstance } from "@/lib/axios"
-import { toast } from "react-hot-toast"
-import { ShowcaseSection } from "@/components/Layouts/showcase-section"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import FAQInput from "./FAQInput"
-import LocationSelector from "../../community/_components/locationSelect"
-import * as LucideIcons from "lucide-react"
-import FeatureInput from "./features"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import InputGroup from "@/components/FormElements/InputGroup";
+import TextArea from "@/components/FormElements/InputGroup/text-area";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { XCircle, Loader2, Plus } from "lucide-react";
+import { axiosInstance } from "@/lib/axios";
+import { toast } from "react-hot-toast";
+import { ShowcaseSection } from "@/components/Layouts/showcase-section";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import FAQInput from "./FAQInput";
+import * as LucideIcons from "lucide-react";
+import FeatureInput from "./features";
+import LocationSelector from "./LocationSelect";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
   price: z.string().min(1, "Price is required"),
   paymentPlan: z.string().min(1, "Payment plan is required"),
   handover: z.string().min(1, "Handover date is required"),
-  paymentStructure: z.string().min(1, "Payment Structure information is required"),
+  paymentStructure: z
+    .string()
+    .min(1, "Payment Structure information is required"),
   downPayment: z.string().min(1, "Down payment information is required"),
   bedrooms: z.string().min(1, "Number of bedrooms is required"),
   area: z.string().min(1, "Area size is required"),
@@ -36,7 +38,9 @@ const propertySchema = z.object({
   amenities: z.array(z.string()).min(1, "At least one amenity is required"),
   paymentDescription: z.string().min(1, "Payment description is required"),
   bookingPercentage: z.string().min(1, "Booking percentage is required"),
-  constructionPercentage: z.string().min(1, "Construction percentage is required"),
+  constructionPercentage: z
+    .string()
+    .min(1, "Construction percentage is required"),
   handOverPercentage: z.string().min(1, "Handover percentage is required"),
   locationDescription: z.string().min(1, "Location description is required"),
   location: z.object({
@@ -52,70 +56,92 @@ const propertySchema = z.object({
     title2: z.string().min(1, "Development title 2 is required"),
     title3: z.string().min(1, "Development title 3 is required"),
   }),
-})
+});
 
-type PropertyFormData = z.infer<typeof propertySchema>
+type PropertyFormData = z.infer<typeof propertySchema>;
 
 interface LocationHighlight {
-  _id?: string
-  title: string
-  time: string
-  image: string
+  _id?: string;
+  title: string;
+  time: string;
+  image: string;
 }
 
 interface PropertyFormProps {
-  property?: any
-  amenitiesData?: any[]
+  property?: any;
+  amenitiesData?: any[];
 }
 
-const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps) => {
-  const [isMounted, setIsMounted] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [imageError, setImageError] = useState<string | null>(null)
+const PropertyForm = ({
+  property = null,
+  amenitiesData = [],
+}: PropertyFormProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   // Image states
-  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null)
-  const [selectedMainImage, setSelectedMainImage] = useState<File | null>(null)
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
+  const [selectedMainImage, setSelectedMainImage] = useState<File | null>(null);
 
-  const [secondaryImagePreview, setSecondaryImagePreview] = useState<string | null>(null)
-  const [selectedSecondaryImage, setSelectedSecondaryImage] = useState<File | null>(null)
+  const [secondaryImagePreview, setSecondaryImagePreview] = useState<
+    string | null
+  >(null);
+  const [selectedSecondaryImage, setSelectedSecondaryImage] =
+    useState<File | null>(null);
 
-  const [sliderImages, setSliderImages] = useState<string[]>([])
-  const [selectedSliderImages, setSelectedSliderImages] = useState<File[]>([])
-  const [existingSliderImages, setExistingSliderImages] = useState<string[]>([])
-  const [removedSliderImages, setRemovedSliderImages] = useState<string[]>([])
+  const [sliderImages, setSliderImages] = useState<string[]>([]);
+  const [selectedSliderImages, setSelectedSliderImages] = useState<File[]>([]);
+  const [existingSliderImages, setExistingSliderImages] = useState<string[]>(
+    [],
+  );
+  const [removedSliderImages, setRemovedSliderImages] = useState<string[]>([]);
 
   // Document states
-  const [brochureFile, setBrochureFile] = useState<File | null>(null)
-  const [brochureImageFile, setBrochureImageFile] = useState<File | null>(null)
-  const [brochureImagePreview, setBrochureImagePreview] = useState<string | null>(null)
+  const [brochureFile, setBrochureFile] = useState<File | null>(null);
+  const [brochureImageFile, setBrochureImageFile] = useState<File | null>(null);
+  const [brochureImagePreview, setBrochureImagePreview] = useState<
+    string | null
+  >(null);
 
-  const [priceListFile, setPriceListFile] = useState<File | null>(null)
-  const [priceListImageFile, setPriceListImageFile] = useState<File | null>(null)
-  const [priceListImagePreview, setPriceListImagePreview] = useState<string | null>(null)
+  const [priceListFile, setPriceListFile] = useState<File | null>(null);
+  const [priceListImageFile, setPriceListImageFile] = useState<File | null>(
+    null,
+  );
+  const [priceListImagePreview, setPriceListImagePreview] = useState<
+    string | null
+  >(null);
 
-  const [paymentFile, setPaymentFile] = useState<File | null>(null)
-  const [paymentImageFile, setPaymentImageFile] = useState<File | null>(null)
-  const [paymentImagePreview, setPaymentImagePreview] = useState<string | null>(null)
-// console.log(priceListFile,  brochureImageFile, paymentImageFile, "checking this",paymentFile, "checking this")
+  const [paymentFile, setPaymentFile] = useState<File | null>(null);
+  const [paymentImageFile, setPaymentImageFile] = useState<File | null>(null);
+  const [paymentImagePreview, setPaymentImagePreview] = useState<string | null>(
+    null,
+  );
+  // console.log(priceListFile,  brochureImageFile, paymentImageFile, "checking this",paymentFile, "checking this")
   // Development images
-  const [developmentImage1File, setDevelopmentImage1File] = useState<File | null>(null)
-  const [developmentImage1Preview, setDevelopmentImage1Preview] = useState<string | null>(null)
-  const [developmentImage2File, setDevelopmentImage2File] = useState<File | null>(null)
-  const [developmentImage2Preview, setDevelopmentImage2Preview] = useState<string | null>(null)
+  const [developmentImage1File, setDevelopmentImage1File] =
+    useState<File | null>(null);
+  const [developmentImage1Preview, setDevelopmentImage1Preview] = useState<
+    string | null
+  >(null);
+  const [developmentImage2File, setDevelopmentImage2File] =
+    useState<File | null>(null);
+  const [developmentImage2Preview, setDevelopmentImage2Preview] = useState<
+    string | null
+  >(null);
 
   // Complex data states
-  const [locationHighlights, setLocationHighlights] = useState<any>([])
-  const [faqs, setFaqs] = useState<{ _id?: string; question: string; answer: string }[]>([])
-  const [removedFaqIds, setRemovedFaqIds] = useState<string[]>([])
+  const [locationHighlights, setLocationHighlights] = useState<any>([]);
+  const [faqs, setFaqs] = useState<
+    { _id?: string; question: string; answer: string }[]
+  >([]);
+  const [removedFaqIds, setRemovedFaqIds] = useState<string[]>([]);
 
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [features, setFeatures] = useState<string[]>([])
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [features, setFeatures] = useState<string[]>([]);
 
-  const router = useRouter()
-  const isEditMode = !!property
-
-
+  const router = useRouter();
+  const isEditMode = !!property;
 
   const {
     register,
@@ -139,9 +165,14 @@ const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps
       developer: property?.developer || "",
       unit: property?.unit || "",
       description: property?.description || "",
-      features: property?.features?.map((feature: any) => (typeof feature === "object" ? feature._id : feature)) || [],
+      features:
+        property?.features?.map((feature: any) =>
+          typeof feature === "object" ? feature._id : feature,
+        ) || [],
       amenities:
-        property?.amenities?.map((amenity: any) => (typeof amenity === "object" ? amenity._id : amenity)) || [],
+        property?.amenities?.map((amenity: any) =>
+          typeof amenity === "object" ? amenity._id : amenity,
+        ) || [],
       paymentDescription: property?.paymentDescription || "",
       bookingPercentage: property?.bookingPercentage || "",
       constructionPercentage: property?.constructionPercentage || "",
@@ -161,18 +192,18 @@ const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps
         title3: property?.development?.title3 || "",
       },
     },
-  })
+  });
 
   useEffect(() => {
-    setIsMounted(true)
+    setIsMounted(true);
 
     if (isEditMode) {
       if (property?.mainImage) {
-        setMainImagePreview(`${property.mainImage}`)
+        setMainImagePreview(`${property.mainImage}`);
       }
 
       if (property?.secondaryImage) {
-        setSecondaryImagePreview(`${property.secondaryImage}`)
+        setSecondaryImagePreview(`${property.secondaryImage}`);
       }
 
       // Set slider images
@@ -180,95 +211,100 @@ const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps
         const sliderImgPreviews = property.sliderImages.map((image: any) => {
           // Handle if image is an array or string
           if (Array.isArray(image)) {
-            return image[0]
+            return image[0];
           }
-          return `${image}`
-        })
-        setSliderImages(sliderImgPreviews)
-        setExistingSliderImages(property.sliderImages)
+          return `${image}`;
+        });
+        setSliderImages(sliderImgPreviews);
+        setExistingSliderImages(property.sliderImages);
       }
 
       // Set document previews
       if (property?.brochure?.image) {
-        setBrochureImagePreview(`${property.brochure.image}`)
+        setBrochureImagePreview(`${property.brochure.image}`);
       }
 
       if (property?.priceList?.image) {
-        setPriceListImagePreview(`${property.priceList.image}`)
+        setPriceListImagePreview(`${property.priceList.image}`);
       }
 
       if (property?.payment?.image) {
-        setPaymentImagePreview(`${property.payment.image}`)
+        setPaymentImagePreview(`${property.payment.image}`);
       }
 
       // Set development images
       if (property?.development?.image1) {
-        setDevelopmentImage1Preview(`${property.development.image1}`)
+        setDevelopmentImage1Preview(`${property.development.image1}`);
       }
 
       if (property?.development?.image2) {
-        setDevelopmentImage2Preview(`${property.development.image2}`)
+        setDevelopmentImage2Preview(`${property.development.image2}`);
       }
 
       // Set amenities
       if (property?.amenities && Array.isArray(property.amenities)) {
         const amenityIds = property.amenities.map((amenity: any) => {
           if (amenity && typeof amenity === "object" && amenity._id) {
-            return String(amenity._id)
+            return String(amenity._id);
           }
-          return String(amenity)
-        })
+          return String(amenity);
+        });
 
-        setSelectedAmenities(amenityIds)
-        setValue("amenities", amenityIds)
+        setSelectedAmenities(amenityIds);
+        setValue("amenities", amenityIds);
       }
 
       // Set features
       if (property?.features && Array.isArray(property.features)) {
         const featureValues = property.features.map((feature: any) => {
           if (feature && typeof feature === "object" && feature.title) {
-            return feature.title
+            return feature.title;
           }
-          return String(feature)
-        })
-        setFeatures(featureValues)
+          return String(feature);
+        });
+        setFeatures(featureValues);
       }
 
       // Set property type
 
       // Set location highlights
-      if (property?.locationHighlights && Array.isArray(property.locationHighlights)) {
-        setLocationHighlights(property.locationHighlights)
+      if (
+        property?.locationHighlights &&
+        Array.isArray(property.locationHighlights)
+      ) {
+        setLocationHighlights(property.locationHighlights);
       }
 
       // Set FAQs
       if (property?.faqs && Array.isArray(property.faqs)) {
-        setFaqs(property.faqs)
+        setFaqs(property.faqs);
       }
 
       // Set boolean values
       if (property?.isAffordable !== undefined) {
-        setValue("isAffordable", property.isAffordable)
+        setValue("isAffordable", property.isAffordable);
       }
 
       if (property?.isLuxury !== undefined) {
-        setValue("isLuxury", property.isLuxury)
+        setValue("isLuxury", property.isLuxury);
       }
 
       if (property?.isExclusive !== undefined) {
-        setValue("isExclusive", property.isExclusive)
+        setValue("isExclusive", property.isExclusive);
       }
     }
-  }, [isEditMode, property, setValue])
+  }, [isEditMode, property, setValue]);
 
   const handleAmenityChange = (amenityId: string) => {
     setSelectedAmenities((prev) => {
-      const newSelection = prev.includes(amenityId) ? prev.filter((id) => id !== amenityId) : [...prev, amenityId]
+      const newSelection = prev.includes(amenityId)
+        ? prev.filter((id) => id !== amenityId)
+        : [...prev, amenityId];
 
-      setValue("amenities", newSelection)
-      return newSelection
-    })
-  }
+      setValue("amenities", newSelection);
+      return newSelection;
+    });
+  };
 
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -282,97 +318,100 @@ const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps
       | "developmentImage1"
       | "developmentImage2",
   ) => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     // Common image validation
     const validateImage = (file: File): boolean => {
       if (file.size > 15 * 1024 * 1024) {
-        setImageError("Image size should be less than 15MB")
-        return false
+        setImageError("Image size should be less than 15MB");
+        return false;
       }
 
-      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
       if (!validTypes.includes(file.type)) {
-        setImageError("Please upload a valid image (JPEG, PNG, GIF, WEBP)")
-        return false
+        setImageError("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
+        return false;
       }
 
-      setImageError(null)
-      return true
-    }
+      setImageError(null);
+      return true;
+    };
 
-    const file = files[0]
-    if (!validateImage(file)) return
+    const file = files[0];
+    if (!validateImage(file)) return;
 
     switch (type) {
       case "main":
-        setMainImagePreview(URL.createObjectURL(file))
-        setSelectedMainImage(file)
-        break
+        setMainImagePreview(URL.createObjectURL(file));
+        setSelectedMainImage(file);
+        break;
       case "secondary":
-        setSecondaryImagePreview(URL.createObjectURL(file))
-        setSelectedSecondaryImage(file)
-        break
+        setSecondaryImagePreview(URL.createObjectURL(file));
+        setSelectedSecondaryImage(file);
+        break;
       case "slider":
-        const newFiles: File[] = []
-        const newPreviews: string[] = []
+        const newFiles: File[] = [];
+        const newPreviews: string[] = [];
 
         Array.from(files).forEach((file) => {
           if (validateImage(file)) {
-            newFiles.push(file)
-            newPreviews.push(URL.createObjectURL(file))
+            newFiles.push(file);
+            newPreviews.push(URL.createObjectURL(file));
           }
-        })
+        });
 
-        setSelectedSliderImages((prev) => [...prev, ...newFiles])
-        setSliderImages((prev) => [...prev, ...newPreviews])
-        break
+        setSelectedSliderImages((prev) => [...prev, ...newFiles]);
+        setSliderImages((prev) => [...prev, ...newPreviews]);
+        break;
       case "brochureImage":
-        setBrochureImagePreview(URL.createObjectURL(file))
-        setBrochureImageFile(file)
-        break
+        setBrochureImagePreview(URL.createObjectURL(file));
+        setBrochureImageFile(file);
+        break;
       case "priceListImage":
-        setPriceListImagePreview(URL.createObjectURL(file))
-        setPriceListImageFile(file)
-        break
+        setPriceListImagePreview(URL.createObjectURL(file));
+        setPriceListImageFile(file);
+        break;
       case "paymentImage":
-        setPaymentImagePreview(URL.createObjectURL(file))
-        setPaymentImageFile(file)
-        break
+        setPaymentImagePreview(URL.createObjectURL(file));
+        setPaymentImageFile(file);
+        break;
       case "developmentImage1":
-        setDevelopmentImage1Preview(URL.createObjectURL(file))
-        setDevelopmentImage1File(file)
-        break
+        setDevelopmentImage1Preview(URL.createObjectURL(file));
+        setDevelopmentImage1File(file);
+        break;
       case "developmentImage2":
-        setDevelopmentImage2Preview(URL.createObjectURL(file))
-        setDevelopmentImage2File(file)
-        break
+        setDevelopmentImage2Preview(URL.createObjectURL(file));
+        setDevelopmentImage2File(file);
+        break;
     }
-  }
+  };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, type: "brochure" | "priceList" | "payment") => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "brochure" | "priceList" | "payment",
+  ) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    const file = files[0]
+    const file = files[0];
     if (file.size > 15 * 1024 * 1024) {
-      toast.error("File size should be less than 15MB")
-      return
+      toast.error("File size should be less than 15MB");
+      return;
     }
 
     switch (type) {
       case "brochure":
-        setBrochureFile(file)
-        break
+        setBrochureFile(file);
+        break;
       case "priceList":
-        setPriceListFile(file)
-        break
+        setPriceListFile(file);
+        break;
       case "payment":
-        setPaymentFile(file)
-        break
+        setPaymentFile(file);
+        break;
     }
-  }
+  };
 
   const removeImage = (
     type:
@@ -388,299 +427,338 @@ const PropertyForm = ({ property = null, amenitiesData = [] }: PropertyFormProps
   ) => {
     switch (type) {
       case "main":
-        setMainImagePreview(null)
-        setSelectedMainImage(null)
-        break
+        setMainImagePreview(null);
+        setSelectedMainImage(null);
+        break;
       case "secondary":
-        setSecondaryImagePreview(null)
-        setSelectedSecondaryImage(null)
-        break
+        setSecondaryImagePreview(null);
+        setSelectedSecondaryImage(null);
+        break;
       case "slider":
         if (typeof index === "number") {
           if (index < existingSliderImages.length) {
-            const imageToRemove = existingSliderImages[index]
-            setRemovedSliderImages((prev) => [...prev, imageToRemove])
+            const imageToRemove = existingSliderImages[index];
+            setRemovedSliderImages((prev) => [...prev, imageToRemove]);
             setExistingSliderImages((prev) => {
-              const updated = [...prev]
-              updated.splice(index, 1)
-              return updated
-            })
+              const updated = [...prev];
+              updated.splice(index, 1);
+              return updated;
+            });
           }
 
           setSliderImages((prev) => {
-            const updated = [...prev]
-            updated.splice(index, 1)
-            return updated
-          })
+            const updated = [...prev];
+            updated.splice(index, 1);
+            return updated;
+          });
 
           if (index >= existingSliderImages.length) {
             setSelectedSliderImages((prev) => {
-              const updated = [...prev]
-              updated.splice(index - existingSliderImages.length, 1)
-              return updated
-            })
+              const updated = [...prev];
+              updated.splice(index - existingSliderImages.length, 1);
+              return updated;
+            });
           }
         }
-        break
+        break;
       case "brochureImage":
-        setBrochureImagePreview(null)
-        setBrochureImageFile(null)
-        break
+        setBrochureImagePreview(null);
+        setBrochureImageFile(null);
+        break;
       case "priceListImage":
-        setPriceListImagePreview(null)
-        setPriceListImageFile(null)
-        break
+        setPriceListImagePreview(null);
+        setPriceListImageFile(null);
+        break;
       case "paymentImage":
-        setPaymentImagePreview(null)
-        setPaymentImageFile(null)
-        break
+        setPaymentImagePreview(null);
+        setPaymentImageFile(null);
+        break;
       case "developmentImage1":
-        setDevelopmentImage1Preview(null)
-        setDevelopmentImage1File(null)
-        break
+        setDevelopmentImage1Preview(null);
+        setDevelopmentImage1File(null);
+        break;
       case "developmentImage2":
-        setDevelopmentImage2Preview(null)
-        setDevelopmentImage2File(null)
-        break
+        setDevelopmentImage2Preview(null);
+        setDevelopmentImage2File(null);
+        break;
     }
-  }
+  };
 
   const handleAddLocationHighlight = () => {
-    setLocationHighlights([...locationHighlights, { title: "", time: "", image: "" }])
-  }
+    setLocationHighlights([
+      ...locationHighlights,
+      { title: "", time: "", image: "" },
+    ]);
+  };
 
   const handleRemoveLocationHighlight = (index: number) => {
-    setLocationHighlights(locationHighlights.filter((_: any, i: any) => i !== index))
-  }
+    setLocationHighlights(
+      locationHighlights.filter((_: any, i: any) => i !== index),
+    );
+  };
 
-  const handleUpdateLocationHighlight = (index: number, field: keyof LocationHighlight, value: string) => {
-    const updatedHighlights = [...locationHighlights]
-    updatedHighlights[index] = { ...updatedHighlights[index], [field]: value }
-    setLocationHighlights(updatedHighlights)
-  }
+  const handleUpdateLocationHighlight = (
+    index: number,
+    field: keyof LocationHighlight,
+    value: string,
+  ) => {
+    const updatedHighlights = [...locationHighlights];
+    updatedHighlights[index] = { ...updatedHighlights[index], [field]: value };
+    setLocationHighlights(updatedHighlights);
+  };
 
+  const handleLocationImageChange = (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-  const handleLocationImageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
+    const file = files[0];
     if (file.size > 15 * 1024 * 1024) {
-      toast.error("Image size should be less than 15MB")
-      return
+      toast.error("Image size should be less than 15MB");
+      return;
     }
 
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     if (!validTypes.includes(file.type)) {
-      toast.error("Please upload a valid image (JPEG, PNG, GIF, WEBP)")
-      return
+      toast.error("Please upload a valid image (JPEG, PNG, GIF, WEBP)");
+      return;
     }
 
     // Create file preview URL and update the location highlights
-    const imageUrl = URL.createObjectURL(file)
-    const updatedHighlights = [...locationHighlights]
+    const imageUrl = URL.createObjectURL(file);
+    const updatedHighlights = [...locationHighlights];
     updatedHighlights[index] = {
       ...updatedHighlights[index],
       image: imageUrl,
       imageFile: file, // Store the file object for form submission
-    }
-    setLocationHighlights(updatedHighlights)
-  }
+    };
+    setLocationHighlights(updatedHighlights);
+  };
 
-  const handleCheckboxChange = (field: "isAffordable" | "isLuxury" | "isExclusive") => {
-    setValue(field, !watch(field))
-  }
+  const handleCheckboxChange = (
+    field: "isAffordable" | "isLuxury" | "isExclusive",
+  ) => {
+    setValue(field, !watch(field));
+  };
 
   // console.log("Form data:", data);
-console.log("Validation errors:", errors);
-console.log("Selected amenities:", selectedAmenities);
-console.log("Features:", features);
 
   const onSubmit = async (data: any) => {
-    console.log(data, "checking this ")
-    console.log("Validation errors:", errors); // Log all validation errors
-
     if (selectedAmenities.length === 0) {
-      toast.error("At least one amenity should be selected")
-      return
+      toast.error("At least one amenity should be selected");
+      return;
     }
     if (features.length === 0) {
-      toast.error("At least one feature is required")
-      return
+      toast.error("At least one feature is required");
+      return;
     }
 
     if (!isEditMode && !selectedMainImage) {
-      toast.error("Main image is required")
-      return
+      toast.error("Main image is required");
+      return;
     }
     if (!isEditMode && !selectedSecondaryImage) {
-      toast.error("Secondary image is required")
-      return
+      toast.error("Secondary image is required");
+      return;
     }
     if (!isEditMode && sliderImages.length === 0) {
-      toast.error("At least one slider image is required")
-      return
+      toast.error("At least one slider image is required");
+      return;
     }
 
     if (locationHighlights.length > 0) {
       const locationHighlightsValid = locationHighlights.every(
         (highlight: any) =>
-          highlight.title.trim() !== "" && highlight.time.trim() !== "" && (highlight.image ? true : false),
-      )
+          highlight.title.trim() !== "" &&
+          highlight.time.trim() !== "" &&
+          (highlight.image ? true : false),
+      );
 
       if (!locationHighlightsValid) {
-        toast.error("All location highlights must have title, travel time, and valid image (max 5MB)")
-        return
+        toast.error(
+          "All location highlights must have title, travel time, and valid image (max 5MB)",
+        );
+        return;
       }
     }
 
     if (faqs.length === 0) {
-      toast.error("At least one FAQ is required")
-      return
+      toast.error("At least one FAQ is required");
+      return;
     }
 
     // Validate development section
-    if (!data.development.title1 || !data.development.title2 || !data.development.title3) {
-      toast.error("All development titles are required")
-      return
+    if (
+      !data.development.title1 ||
+      !data.development.title2 ||
+      !data.development.title3
+    ) {
+      toast.error("All development titles are required");
+      return;
     }
 
-    if (!isEditMode && (!developmentImage1Preview || !developmentImage2Preview)) {
-      toast.error("Both development images are required")
-      return
+    if (
+      !isEditMode &&
+      (!developmentImage1Preview || !developmentImage2Preview)
+    ) {
+      toast.error("Both development images are required");
+      return;
     }
 
-    setIsSubmitting(true)
-    setImageError(null)
+    setIsSubmitting(true);
+    setImageError(null);
 
     try {
-      const formDataToSend = new FormData()
+      const formDataToSend = new FormData();
 
       // Add basic fields
-      formDataToSend.append("title", data.title)
-      formDataToSend.append("price", data.price)
-      formDataToSend.append("paymentPlan", data.paymentPlan)
-      formDataToSend.append("handover", data.handover)
-      formDataToSend.append("paymentStructure", data.paymentStructure)
-      formDataToSend.append("downPayment", data.downPayment)
-      formDataToSend.append("bedrooms", data.bedrooms)
-      formDataToSend.append("area", data.area)
-      formDataToSend.append("developer", data.developer)
-      formDataToSend.append("unit", data.unit)
-      formDataToSend.append("description", data.description)
-      formDataToSend.append("locationDescription", data.locationDescription)
-      formDataToSend.append("country", data.location.country)
-      formDataToSend.append("paymentDescription", data.paymentDescription)
-      formDataToSend.append("bookingPercentage", data.bookingPercentage)
-      formDataToSend.append("constructionPercentage", data.constructionPercentage)
-      formDataToSend.append("handOverPercentage", data.handOverPercentage)
-      formDataToSend.append("isAffordable", data.isAffordable ? "true" : "false")
-      formDataToSend.append("isLuxury", data.isLuxury ? "true" : "false")
-      formDataToSend.append("isExclusive", data.isExclusive ? "true" : "false")
+      formDataToSend.append("title", data.title);
+      formDataToSend.append("price", data.price);
+      formDataToSend.append("paymentPlan", data.paymentPlan);
+      formDataToSend.append("handover", data.handover);
+      formDataToSend.append("paymentStructure", data.paymentStructure);
+      formDataToSend.append("downPayment", data.downPayment);
+      formDataToSend.append("bedrooms", data.bedrooms);
+      formDataToSend.append("area", data.area);
+      formDataToSend.append("developer", data.developer);
+      formDataToSend.append("unit", data.unit);
+      formDataToSend.append("description", data.description);
+      formDataToSend.append("locationDescription", data.locationDescription);
+      formDataToSend.append("country", data.location.country);
+      formDataToSend.append("paymentDescription", data.paymentDescription);
+      formDataToSend.append("bookingPercentage", data.bookingPercentage);
+      formDataToSend.append(
+        "constructionPercentage",
+        data.constructionPercentage,
+      );
+      formDataToSend.append("handOverPercentage", data.handOverPercentage);
+      formDataToSend.append(
+        "isAffordable",
+        data.isAffordable ? "true" : "false",
+      );
+      formDataToSend.append("isLuxury", data.isLuxury ? "true" : "false");
+      formDataToSend.append("isExclusive", data.isExclusive ? "true" : "false");
 
       // Development titles
-      formDataToSend.append("development[title1]", data.development.title1)
-      formDataToSend.append("development[title2]", data.development.title2)
-      formDataToSend.append("development[title3]", data.development.title3)
+      formDataToSend.append("development[title1]", data.development.title1);
+      formDataToSend.append("development[title2]", data.development.title2);
+      formDataToSend.append("development[title3]", data.development.title3);
 
-      if ("latitude" in data.location && typeof data.location.latitude === "number") {
-        formDataToSend.append("latitude", data.location.latitude.toString())
+      if (
+        "latitude" in data.location &&
+        typeof data.location.latitude === "number"
+      ) {
+        formDataToSend.append("latitude", data.location.latitude.toString());
       }
-      if ("longitude" in data.location && typeof data.location.longitude === "number") {
-        formDataToSend.append("longitude", data.location.longitude.toString())
+      if (
+        "longitude" in data.location &&
+        typeof data.location.longitude === "number"
+      ) {
+        formDataToSend.append("longitude", data.location.longitude.toString());
       }
 
       // Add amenities and features
       selectedAmenities.forEach((amenityId) => {
-        formDataToSend.append("amenities[]", amenityId)
-      })
+        formDataToSend.append("amenities[]", amenityId);
+      });
 
       // Add features
       features.forEach((feature) => {
-        formDataToSend.append("features[]", feature)
-      })
+        formDataToSend.append("features[]", feature);
+      });
 
       // Add images
       if (selectedMainImage) {
-        formDataToSend.append("mainImage", selectedMainImage)
+        formDataToSend.append("mainImage", selectedMainImage);
       }
 
       if (selectedSecondaryImage) {
-        formDataToSend.append("secondaryImage", selectedSecondaryImage)
+        formDataToSend.append("secondaryImage", selectedSecondaryImage);
       }
 
       if (isEditMode) {
         if (existingSliderImages.length > 0) {
-          const normalizedImages = existingSliderImages.flat().filter((img) => typeof img === "string")
-          formDataToSend.append("sliderImages", JSON.stringify(normalizedImages))
+          const normalizedImages = existingSliderImages
+            .flat()
+            .filter((img) => typeof img === "string");
+          formDataToSend.append(
+            "sliderImages",
+            JSON.stringify(normalizedImages),
+          );
         }
 
         selectedSliderImages.forEach((file) => {
-          formDataToSend.append("sliderImages", file)
-        })
+          formDataToSend.append("sliderImages", file);
+        });
       } else {
         selectedSliderImages.forEach((file) => {
-          formDataToSend.append("sliderImages", file)
-        })
+          formDataToSend.append("sliderImages", file);
+        });
       }
 
       // Add document files and images
       if (brochureFile) {
-        formDataToSend.append("brochureUrl", brochureFile)
+        formDataToSend.append("brochureUrl", brochureFile);
       }
       if (brochureImageFile) {
-        formDataToSend.append("brochureImage", brochureImageFile)
+        formDataToSend.append("brochureImage", brochureImageFile);
       }
 
       if (priceListFile) {
-        formDataToSend.append("priceListUrl", priceListFile)
+        formDataToSend.append("priceListUrl", priceListFile);
       }
       if (priceListImageFile) {
-        formDataToSend.append("priceListImage", priceListImageFile)
+        formDataToSend.append("priceListImage", priceListImageFile);
       }
 
       if (paymentFile) {
-        formDataToSend.append("paymentUrl", paymentFile)
+        formDataToSend.append("paymentUrl", paymentFile);
       }
       if (paymentImageFile) {
-        formDataToSend.append("paymentImage", paymentImageFile)
+        formDataToSend.append("paymentImage", paymentImageFile);
       }
 
       // Add development images
       if (developmentImage1File) {
-        formDataToSend.append("developmentImage1", developmentImage1File)
+        formDataToSend.append("developmentImage1", developmentImage1File);
       }
       if (developmentImage2File) {
-        formDataToSend.append("developmentImage2", developmentImage2File)
+        formDataToSend.append("developmentImage2", developmentImage2File);
       }
 
       // Add location highlights
       formDataToSend.append(
         "locationHighlights",
-        JSON.stringify(locationHighlights.map(({ imageFile, ...highlight }: any) => highlight)),
-      )
+        JSON.stringify(
+          locationHighlights.map(
+            ({ imageFile, ...highlight }: any) => highlight,
+          ),
+        ),
+      );
 
       // Add location highlight images
       locationHighlights.forEach((highlight: any, index: number) => {
         if (highlight.imageFile) {
-          formDataToSend.append(`locationImages_${index}`, highlight.imageFile)
+          formDataToSend.append(`locationImages_${index}`, highlight.imageFile);
         }
-      })
+      });
 
       // Add FAQs
       faqs.forEach((faq, index) => {
         if (faq._id) {
-          formDataToSend.append(`faqs[${index}][_id]`, faq._id)
+          formDataToSend.append(`faqs[${index}][_id]`, faq._id);
         }
-        formDataToSend.append(`faqs[${index}][question]`, faq.question)
-        formDataToSend.append(`faqs[${index}][answer]`, faq.answer)
-      })
+        formDataToSend.append(`faqs[${index}][question]`, faq.question);
+        formDataToSend.append(`faqs[${index}][answer]`, faq.answer);
+      });
 
       // Add removed FAQ IDs if in edit mode
       if (isEditMode && removedFaqIds.length > 0) {
         removedFaqIds.forEach((id) => {
-          formDataToSend.append("removedFaqIds", id)
-        })
+          formDataToSend.append("removedFaqIds", id);
+        });
       }
 
       if (isEditMode) {
@@ -689,33 +767,35 @@ console.log("Features:", features);
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        })
-        toast.success("Property updated successfully!")
+        });
+        toast.success("Property updated successfully!");
       } else {
         // Create new property
         await axiosInstance.post("/property", formDataToSend, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        })
-        toast.success("Property added successfully!")
+        });
+        toast.success("Property added successfully!");
       }
 
       // Redirect to properties list page
-      router.push("/admin/property")
-      router.refresh()
+      router.push("/admin/property");
+      router.refresh();
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
       toast.error(
-        isEditMode ? "Failed to update property. Please try again." : "Failed to add property. Please try again.",
-      )
+        isEditMode
+          ? "Failed to update property. Please try again."
+          : "Failed to add property. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   if (!isMounted) {
-    return null
+    return null;
   }
 
   return (
@@ -723,7 +803,9 @@ console.log("Features:", features);
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Basic Information */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">Basic Information</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">
+            Basic Information
+          </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-1">
             <InputGroup
               label="Title"
@@ -894,44 +976,49 @@ console.log("Features:", features);
             />
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div className="flex items-center space-x-2">
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50">
               <Checkbox
                 id="isAffordable"
                 checked={watch("isAffordable")}
                 onCheckedChange={() => handleCheckboxChange("isAffordable")}
+                className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
               />
               <label
                 htmlFor="isAffordable"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+                className="text-sm font-medium text-gray-700 hover:cursor-pointer dark:text-gray-200"
               >
-                Is Affordable
+                Affordable
               </label>
             </div>
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50">
               <Checkbox
                 id="isLuxury"
                 checked={watch("isLuxury")}
                 onCheckedChange={() => handleCheckboxChange("isLuxury")}
+                className="h-5 w-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
               />
               <label
                 htmlFor="isLuxury"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+                className="text-sm font-medium text-gray-700 hover:cursor-pointer dark:text-gray-200"
               >
-                Is Luxury
+                Luxury
               </label>
             </div>
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50">
               <Checkbox
                 id="isExclusive"
                 checked={watch("isExclusive")}
                 onCheckedChange={() => handleCheckboxChange("isExclusive")}
+                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"
               />
               <label
                 htmlFor="isExclusive"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white"
+                className="text-sm font-medium text-gray-700 hover:cursor-pointer dark:text-gray-200"
               >
-                Is Exclusive
+                Exclusive
               </label>
             </div>
           </div>
@@ -939,7 +1026,9 @@ console.log("Features:", features);
 
         {/* Property Images */}
         <ShowcaseSection>
-          <h2 className="mb-4 text-xl font-semibold text-white">Property Images</h2>
+          <h2 className="mb-4 text-xl font-semibold text-white">
+            Property Images
+          </h2>
 
           {/* Main Image */}
           <div className="mb-6">
@@ -972,13 +1061,16 @@ console.log("Features:", features);
                 </div>
               )}
             </div>
-            {imageError && <p className="mt-1 text-sm text-red-500">{imageError}</p>}
+            {imageError && (
+              <p className="mt-1 text-sm text-red-500">{imageError}</p>
+            )}
           </div>
 
           {/* Secondary Image */}
           <div className="mb-6">
             <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
-              Secondary Image <span className="ml-1 select-none text-red">*</span>
+              Secondary Image{" "}
+              <span className="ml-1 select-none text-red">*</span>
             </label>
             <div className="flex flex-col gap-4">
               <input
@@ -1051,7 +1143,9 @@ console.log("Features:", features);
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {amenitiesData.map((amenity) => {
-              const Icon = LucideIcons[amenity.iconName as keyof typeof LucideIcons] as React.ComponentType<any>
+              const Icon = LucideIcons[
+                amenity.iconName as keyof typeof LucideIcons
+              ] as React.ComponentType<any>;
 
               return (
                 <div
@@ -1067,7 +1161,10 @@ console.log("Features:", features);
 
                   <div className="mb-3">
                     {Icon ? (
-                      <Icon size={36} className="text-gray-700 dark:text-gray-500" />
+                      <Icon
+                        size={36}
+                        className="text-gray-700 dark:text-gray-500"
+                      />
                     ) : (
                       <span className="text-gray-500">❓</span>
                     )}
@@ -1080,11 +1177,15 @@ console.log("Features:", features);
                     {amenity.title}
                   </label>
                 </div>
-              )
+              );
             })}
           </div>
 
-          {errors.amenities && <p className="mt-2 text-sm text-red-500">{errors.amenities.message}</p>}
+          {errors.amenities && (
+            <p className="mt-2 text-sm text-red-500">
+              {errors.amenities.message}
+            </p>
+          )}
         </ShowcaseSection>
 
         {/* Features */}
@@ -1094,14 +1195,18 @@ console.log("Features:", features);
           </div>
 
           <FeatureInput
-            onFeatureChange={(updatedFeatures:any) => {
-              setFeatures(updatedFeatures)
-              setValue("features", updatedFeatures)
+            onFeatureChange={(updatedFeatures: any) => {
+              setFeatures(updatedFeatures);
+              setValue("features", updatedFeatures);
             }}
             initialFeatures={features}
           />
 
-          {errors.features && <p className="mt-2 text-sm text-red-500">{errors.features.message}</p>}
+          {errors.features && (
+            <p className="mt-2 text-sm text-red-500">
+              {errors.features.message}
+            </p>
+          )}
         </ShowcaseSection>
 
         {/* Location */}
@@ -1131,7 +1236,9 @@ console.log("Features:", features);
           {/* Location Highlights */}
           <div className="mt-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-white">Location Highlights</h3>
+              <h3 className="text-lg font-medium text-white">
+                Location Highlights
+              </h3>
               <Button
                 type="button"
                 onClick={handleAddLocationHighlight}
@@ -1143,9 +1250,14 @@ console.log("Features:", features);
             </div>
 
             {locationHighlights.map((highlight: any, index: number) => (
-              <div key={index} className="mb-4 rounded-lg border border-gray-700 p-4">
+              <div
+                key={index}
+                className="mb-4 rounded-lg border border-gray-700 p-4"
+              >
                 <div className="mb-4 flex items-center justify-between">
-                  <h4 className="text-md font-medium text-white">Highlight {index + 1}</h4>
+                  <h4 className="text-md font-medium text-white">
+                    Highlight {index + 1}
+                  </h4>
                   <Button
                     type="button"
                     onClick={() => handleRemoveLocationHighlight(index)}
@@ -1163,7 +1275,13 @@ console.log("Features:", features);
                     type="text"
                     name={`locationHighlight-${index}-title`}
                     value={highlight.title}
-                    handleChange={(e) => handleUpdateLocationHighlight(index, "title", e.target.value)}
+                    handleChange={(e) =>
+                      handleUpdateLocationHighlight(
+                        index,
+                        "title",
+                        e.target.value,
+                      )
+                    }
                     register={() => {}}
                   />
                   <InputGroup
@@ -1172,13 +1290,21 @@ console.log("Features:", features);
                     type="text"
                     name={`locationHighlight-${index}-time`}
                     value={highlight.time}
-                    handleChange={(e) => handleUpdateLocationHighlight(index, "time", e.target.value)}
+                    handleChange={(e) =>
+                      handleUpdateLocationHighlight(
+                        index,
+                        "time",
+                        e.target.value,
+                      )
+                    }
                     register={() => {}}
                   />
                 </div>
 
                 <div className="mt-4">
-                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Image</label>
+                  <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                    Image
+                  </label>
                   <input
                     type="file"
                     accept="image/*"
@@ -1211,7 +1337,9 @@ console.log("Features:", features);
             <h3 className="mb-3 text-lg font-medium text-white">Brochure</h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Brochure File</label>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Brochure File
+                </label>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
@@ -1225,7 +1353,9 @@ console.log("Features:", features);
                 )}
               </div>
               <div>
-                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Brochure Image</label>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Brochure Image
+                </label>
                 <input
                   type="file"
                   accept="image/*"
@@ -1259,7 +1389,9 @@ console.log("Features:", features);
             <h3 className="mb-3 text-lg font-medium text-white">Price List</h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Price List File</label>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Price List File
+                </label>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
@@ -1309,7 +1441,9 @@ console.log("Features:", features);
             <h3 className="mb-3 text-lg font-medium text-white">Payment</h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Payment File</label>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Payment File
+                </label>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
@@ -1323,7 +1457,9 @@ console.log("Features:", features);
                 )}
               </div>
               <div>
-                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">Payment Image</label>
+                <label className="mb-2 block text-body-sm font-medium text-dark dark:text-white">
+                  Payment Image
+                </label>
                 <input
                   type="file"
                   accept="image/*"
@@ -1475,9 +1611,9 @@ console.log("Features:", features);
 
           <FAQInput
             onFAQChange={(updatedFaqs, removedIds) => {
-              setFaqs(updatedFaqs)
+              setFaqs(updatedFaqs);
               if (removedIds) {
-                setRemovedFaqIds(removedIds)
+                setRemovedFaqIds(removedIds);
               }
             }}
             initialFaqs={property?.faqs || []}
@@ -1494,7 +1630,11 @@ console.log("Features:", features);
             Cancel
           </Button>
 
-          <Button type="submit" disabled={isSubmitting} className="w-1/2 py-6 text-lg text-white">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-1/2 py-6 text-lg text-white"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1507,7 +1647,7 @@ console.log("Features:", features);
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default PropertyForm
+export default PropertyForm;

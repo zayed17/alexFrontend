@@ -12,34 +12,27 @@ interface LocationCard {
 interface LocationSectionProps {
   location: LocationCard[];
   locationDescription: string;
-  mapImageUrl: string;
+  longitude: string;
+  latitude: string;
 }
-
-const property = {
-  id: "prop-001",
-  name: "Elegant Villa",
-  location: {
-    latitude: 37.7749,
-    longitude: -122.4194,
-  },
-};
-
-const markers = [
-  {
-    id: "marker-1",
-    title: "Property Location",
-    position: {
-      lat: 37.7749,
-      lng: -122.4194,
-    },
-  },
-];
 
 const LocationSection = ({
   location,
   locationDescription,
-  mapImageUrl,
+  longitude,
+  latitude,
 }: LocationSectionProps) => {
+
+  const markers = [
+  {
+    id: "marker-1",
+    title: "Property Location",
+    position: {
+      lat: latitude,
+      lng: longitude,
+    },
+  },
+];
   return (
     <div className="containers w-full bg-white py-12 md:py-16">
       <div className="">
@@ -90,8 +83,8 @@ const LocationSection = ({
           <div className="h-85 relative mt-8 w-full overflow-hidden rounded-3xl md:h-115">
             <MapViewer
               initialCenter={{
-                lat: property?.location?.latitude,
-                lng: property?.location?.longitude,
+                lat: latitude,
+                lng: longitude,
               }}
               zoom={10}
               markers={markers}

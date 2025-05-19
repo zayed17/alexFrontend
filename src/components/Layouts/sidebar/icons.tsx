@@ -209,25 +209,6 @@ export function PropertyIcon(props: PropsType) {
 
 
 
-export function CommunityIcon(props: PropsType) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 2a4 4 0 100 8 4 4 0 000-8zM8 8a4 4 0 11-4 4 4 4 0 014-4zm12 0a4 4 0 11-4 4 4 4 0 014-4zM12 10a6 6 0 00-6 6v2a1 1 0 001 1h2a1 1 0 001-1v-2a6 6 0 0112 0v2a1 1 0 01-1 1h-2a1 1 0 01-1-1v-2a6 6 0 00-6-6zm-8 6a4 4 0 018 0v1H4v-1zm16 0a4 4 0 00-8 0v1h8v-1z"
-      />
-    </svg>
-  );
-}
-
 
 export function AmenityIcon(props: PropsType) {
   return (
@@ -248,24 +229,6 @@ export function AmenityIcon(props: PropsType) {
   );
 }
 
-export function CareerIcon(props: PropsType) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M20 6.5h-3V5a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v1.5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10a2 2 0 0 0-2-2zm-8 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM9 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1.5H9V5z"
-      />
-    </svg>
-  );
-}
 export function ChatBubbleIcon(props: PropsType) {
   return (
     <svg
@@ -282,52 +245,7 @@ export function ChatBubbleIcon(props: PropsType) {
 }
 
 
-export function MediaCenterIcon(props: PropsType) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width={24} 
-      height={24} 
-      viewBox="0 0 24 24" 
-      fill="currentColor" 
-      {...props}
-    >
-      <path d="M10 8.64v6.72L15.27 12 10 8.64zM21 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 12H3V7h18v10z" />
-    </svg>
-  );
-}
 
-
-
-export function AgentIcon(props: PropsType) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path d="M12 12c2.67 0 8 1.34 8 4v3h-6v-2H10v2H4v-3c0-2.66 5.33-4 8-4zm0-2a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm6.5-9h-1.5v3h1.5A1.5 1.5 0 0 1 20 5.5V7h2V5.5A3.5 3.5 0 0 0 18.5 1zM3.5 1A3.5 3.5 0 0 0 0 4.5V7h2V5.5A1.5 1.5 0 0 1 3.5 4H5V1H3.5z" />
-    </svg>
-  );
-}
-
-export function ResumeIcon(props: PropsType) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={24}
-      height={24}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path d="M6 2a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6H6zm7 1.5L18.5 9H13V3.5zM8 13h8v2H8v-2zm0 4h5v2H8v-2zm0-8h8v2H8V9z" />
-    </svg>
-  );
-}
 
 
 export function PhoneIcon(props: PropsType) {
@@ -346,10 +264,9 @@ export function PhoneIcon(props: PropsType) {
 }
 
 
-export function SettingsIcon(props: PropsType) {
+export function DashboardIcon(props: PropsType) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
       width={24}
       height={24}
       viewBox="0 0 24 24"
@@ -359,13 +276,32 @@ export function SettingsIcon(props: PropsType) {
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
+        d="M3 6a3 3 0 013-3h2a3 3 0 013 3v2a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm3-1a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1H6zM3 16a3 3 0 013-3h2a3 3 0 013 3v2a3 3 0 01-3 3H6a3 3 0 01-3-3v-2zm3-1a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1H6zM13 6a3 3 0 013-3h2a3 3 0 013 3v2a3 3 0 01-3 3h-2a3 3 0 01-3-3V6zm3-1a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1V6a1 1 0 00-1-1h-2zM13 16a3 3 0 013-3h2a3 3 0 013 3v2a3 3 0 01-3 3h-2a3 3 0 01-3-3v-2zm3-1a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1h-2z"
+      />
+    </svg>
+  );
+}
+
+export function ClientRequestIcon(props: PropsType) {
+  return (
+    <svg
+      width={24}
+      height={24}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 3.75a8.25 8.25 0 100 16.5 8.25 8.25 0 000-16.5zM2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12z"
       />
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M12 2a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zM12 20a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM3 12a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zM19 12a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2h-1a1 1 0 0 1-1-1zM5.636 5.636a1 1 0 0 1 1.414 0l.707.707a1 1 0 1 1-1.414 1.414l-.707-.707a1 1 0 0 1 0-1.414zM16.95 16.95a1 1 0 0 1 1.414 0l.707.707a1 1 0 0 1-1.414 1.414l-.707-.707a1 1 0 0 1 0-1.414zM5.636 18.364a1 1 0 0 1 0-1.414l.707-.707a1 1 0 1 1 1.414 1.414l-.707.707a1 1 0 0 1-1.414 0zM16.95 7.05a1 1 0 0 1 0-1.414l.707-.707a1 1 0 1 1 1.414 1.414l-.707.707a1 1 0 0 1-1.414 0z"
+        d="M12 7.25a.75.75 0 01.75.75v4a.75.75 0 01-1.5 0V8a.75.75 0 01.75-.75z"
       />
+      <path d="M11 16a1 1 0 112 0 1 1 0 01-2 0z" />
     </svg>
   );
 }

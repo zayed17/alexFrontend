@@ -1,5 +1,21 @@
 import { axiosInstance } from "@/lib/axios";
 
+export enum PropertyType {
+  Affordable = "affordable",
+  Luxury = "luxury",
+  Exclusive = "exclusive",
+}
+
+export async function getProperties(type:PropertyType) {
+  try {
+    const response = await axiosInstance.get("/property?type=" + type);
+    
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching property types:", error);
+    return [];
+  }
+}
 export async function getPropertyTypes() {
   try {
     const response = await axiosInstance.get("/property-type");
@@ -48,64 +64,7 @@ export async function getAmenityById(id:string) {
   }
 }
 
-export async function getCommunity() {
-  try {
-    const response = await axiosInstance.get("/community");
-    return response.data || [];
-  } catch (error) {
-    console.error("Error fetching community:", error);
-    return [];
-  }
-}
 
-export async function getCommunityNames () {
-  try {
-    const response = await axiosInstance.get("/community/names");
-    return response.data || [];
-  } catch (error) {
-    console.error("Error fetching community:", error);
-    return [];
-  }
-}
-
-export async function getCommunityById(id:string) {
-  try {
-    const response = await axiosInstance.get(`/community/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching amenity with ID ${id}:`, error);
-    return null;
-  }
-}
-
-export async function getUserCommunityById(id:string) {
-  try {
-    const response = await axiosInstance.get(`/community/${id}/user`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching amenity with ID ${id}:`, error);
-    return null;
-  }
-}
-
-export async function getCareer() {
-  try {
-    const response = await axiosInstance.get("/career");
-    return response.data || [];
-  } catch (error) {
-    console.error("Error fetching career:", error);
-    return [];
-  }
-}
-export async function getCareerById(id:string) {
-  try {
-    const response = await axiosInstance.get(`/career/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching Career with ID ${id}:`, error);
-    return null;
-  }
-}
 
 export async function getSocialMedia() {
   try {
@@ -142,7 +101,7 @@ export async function getPropertyById(id:string) {
 
 export async function getHomePageData() {
   try {
-    const response = await axiosInstance.get("/property/home-page");
+    const response = await axiosInstance.get("/agent/home");
     return response.data || [];
   } catch (error) {
     console.error("Error fetching property:", error);
@@ -180,24 +139,6 @@ export async function getContactData() {
   }
 }
 
-export async function getReadyProperty() {
-  try {
-    const response = await axiosInstance.get("/ready-property");
-    return response.data || [];
-  } catch (error) {
-    console.error("Error fetching property:", error);
-    return [];
-  }
-}
-export async function getReadyPropertyById(id:string) {
-  try {
-    const response = await axiosInstance.get(`/ready-property/${id}`);
-    return response.data || [];
-  } catch (error) {
-    console.error("Error fetching property:", error);
-    return [];
-  }
-}
 
 export async function getJobApplication() {
   try {

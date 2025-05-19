@@ -2,15 +2,9 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
-function PropertyPayment() {
+function PropertyPayment({paymentDetails}:any) {
   // Dummy data for the payment details
-  const paymentDetails = {
-    description:
-      "Get free advice from our financial experts to maximize your profits and minimize risks. Take the first step toward owning your dream home in one of Dubai's most sought-after destinations.",
-    bookingPercentage: "5%",
-    constructionPercentage: "65%",
-    handoverPercentage: "30%",
-  }
+
 
   return (
     <div className="containers">
@@ -19,17 +13,17 @@ function PropertyPayment() {
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="/images/dubaiharbour/sec-1.png"
+              src={paymentDetails.mainImage}
               alt="Luxury property view"
               fill
               className="object-cover opacity-40"
-            />
+            />  
           </div>
 
           {/* Content */}
           <div className="relative z-10 px-6 py-12 md:px-12 md:py-16">
             <div className="mx-auto max-w-4xl text-center">
-              <h2 className="mb-4 text-3xl font-light text-white md:text-4xl">Attractive 70/30 Payment Plan</h2>
+              <h2 className="mb-4 text-3xl font-light text-white md:text-4xl">Attractive {paymentDetails.paymentPlan} Payment Plan</h2>
               <p className="mx-auto mb-10 max-w-2xl text-center text-sm text-white/90 md:text-base">
                 {paymentDetails.description}
               </p>

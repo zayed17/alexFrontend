@@ -4,54 +4,11 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-interface VideoItem {
-  id: string
-  youtubeUrl: string
-  title: string
-  date: string
+interface YoutubeVideoSliderProps {
+  youtubeUrls: string[]
 }
 
-export default function YoutubeVideoSlider() {
-  // This would come from your backend in production
-  const dummyVideos: VideoItem[] = [
-    {
-      id: "1",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "100 Million Dubai Real Estate Portfolio! Best Projects and Investment Strategies",
-      date: "27 Feb 2025",
-    },
-    {
-      id: "2",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "Factors To Consider In 2025 Dubai Explained!",
-      date: "22 Jan 2025",
-    },
-    {
-      id: "3",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "Top 5 Communities To Invest In Dubai 2025",
-      date: "15 Mar 2025",
-    },
-    {
-      id: "4",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "100 Million Dubai Real Estate Portfolio! Best Projects and Investment Strategies",
-      date: "03 Apr 2025",
-    },
-    {
-      id: "5",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "Dubai Property Market Forecast 2025: What Investors Need To Know",
-      date: "19 Feb 2025",
-    },
-    {
-      id: "6",
-      youtubeUrl: "https://youtu.be/lpZlX0xRY8M",
-      title: "Dubai Property Market Forecast 2025: What Investors Need To Know",
-      date: "19 Feb 2025",
-    },
-]
-
+export default function YoutubeVideoSlider({ youtubeUrls }: YoutubeVideoSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -67,6 +24,14 @@ export default function YoutubeVideoSlider() {
   const getYoutubeThumbnail = (url: string): string => {
     const videoId = getYoutubeVideoId(url)
     return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+  }
+
+  // Generate a simple title from the video ID
+  const generateVideoTitle = (url: string): string => {
+    const videoId = getYoutubeVideoId(url)
+    // Convert the video ID to a more readable format
+    // This is just a placeholder since we don't have actual titles
+    return `Click to view more...`
   }
 
   // Handle scroll buttons
@@ -114,6 +79,16 @@ export default function YoutubeVideoSlider() {
     window.open(youtubeUrl, "_blank")
   }
 
+  // Get current date in the format "DD MMM YYYY"
+  const getCurrentDate = (): string => {
+    const date = new Date()
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+  }
+
   return (
     <section className="mx-auto !my-18 max-w-[110rem] containers ">
       <div className="relative">
@@ -121,7 +96,7 @@ export default function YoutubeVideoSlider() {
         <button
           onClick={() => scroll("left")}
           disabled={!canScrollLeft}
-          className={`absolute border border-gray-5 -left-5 md:-left-12 top-[35%] z-10 flex h-10 w-10   -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-opacity disabled:cursor-not-allowed`}
+          className={`absolute border border-gray-5 -left-5 md:-left-12 top-[35%] z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-opacity disabled:cursor-not-allowed`}
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-5 w-5 " />
@@ -133,24 +108,24 @@ export default function YoutubeVideoSlider() {
           className="flex gap-5 overflow-x-auto pb-6 scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {dummyVideos.map((video) => (
+          {youtubeUrls.map((url, index) => (
             <div
-              key={video.id}
+              key={index}
               className="flex min-w-[270px] cursor-pointer flex-col transition-transform duration-300 hover:scale-[1.02]"
-              onClick={() => handleVideoClick(video.youtubeUrl)}
+              onClick={() => handleVideoClick(url)}
             >
               <div className="relative aspect-video w-full overflow-hidden rounded-xl">
                 <Image
-                  src={getYoutubeThumbnail(video.youtubeUrl) || "/placeholder.svg"}
-                  alt={video.title}
+                  src={getYoutubeThumbnail(url) || "/placeholder.svg"}
+                  alt={`YouTube video ${index + 1}`}
                   fill
                   className="object-cover"
                   sizes="270px"
                 />
               </div>
               <div className="pt-3">
-                <h3 className="mb-1 line-clamp-2 text-sm font-medium font-presto">{video.title}</h3>
-                <p className="text-xs text-gray-500">{video.date}</p>
+                <h3 className="mb-1 line-clamp-2 text-sm font-medium font-presto">{generateVideoTitle(url)}</h3>
+                <p className="text-xs text-gray-500">{getCurrentDate()}</p>
               </div>
             </div>
           ))}
@@ -160,7 +135,7 @@ export default function YoutubeVideoSlider() {
         <button
           onClick={() => scroll("right")}
           disabled={!canScrollRight}
-          className={`absolute border border-gray-5 -right-5 md:-right-12 top-[35%] z-10 flex h-10 w-10   -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-opacity disabled:cursor-not-allowed `}
+          className={`absolute border border-gray-5 -right-5 md:-right-12 top-[35%] z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-md transition-opacity disabled:cursor-not-allowed `}
           aria-label="Scroll right"
         >
           <ChevronRight className="h-5 w-5 " />
